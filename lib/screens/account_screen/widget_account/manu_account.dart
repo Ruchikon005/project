@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:khnomapp/screens/account_screen/personal_info_page.dart';
 import 'package:khnomapp/screens/signin_screen/signin.dart';
+import 'package:khnomapp/screens/store_screen/create_store.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class MenuAccount extends StatefulWidget {
@@ -35,7 +36,7 @@ class _MenuAccountState extends State<MenuAccount> {
            ListTile(
              title: Text('Create Store'),
              leading: Icon(Icons.list_alt_rounded),
-             onTap: () => Navigator.pushNamed(context, PersonalInfo.rountName),
+             onTap: () => Navigator.pushNamed(context, CreateStore.rountName),
            ),
            ListTile(
              title: Text('profile'),

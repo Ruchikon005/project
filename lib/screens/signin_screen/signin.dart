@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:convert' as convert;
 import 'package:flutter/material.dart';
+import 'package:khnomapp/action/get_userimage.dart';
+import 'package:khnomapp/config_ip.dart';
 import 'package:khnomapp/model/user_argument_model.dart';
 import 'package:khnomapp/nav/nav.dart';
 import 'package:khnomapp/screens/signup_screen/signup.dart';
@@ -20,7 +22,6 @@ class _SignInState extends State<SignIn> {
   TextEditingController _email = TextEditingController();
   TextEditingController _password = TextEditingController();
 
-
   static SharedPreferences prefs;
 
   _initPref() async {
@@ -39,15 +40,13 @@ class _SignInState extends State<SignIn> {
   final _formKey = GlobalKey<FormState>();
 
   Future login() async {
-    var url = "http://172.19.238.66:3001/users/authenticate";
-    prefs = await SharedPreferences.getInstance();
-    var response = await http.post(Uri.parse(url), body: {
+    var url = "${ConfigIp.domain}/users/authenticate";
+    http.Response response = await http.post(Uri.parse(url), body: {
       "email": _email.text,
       "password": _password.text,
     });
 
     var jsonResponse;
-
 
     if (response.statusCode == 200) {
       jsonResponse = json.decode(response.body);
@@ -57,16 +56,15 @@ class _SignInState extends State<SignIn> {
       print("Response status: ${response.body}");
 
       if (jsonResponse != null) {
-        setState(() {
-        });
+        // setState(() {
+        // });
 
         prefs.setString("token", jsonResponse['token']);
         print(prefs.getString('token'));
         _getProfile();
       }
     } else {
-      setState(() {
-      });
+      setState(() {});
 
       print("Response status: ${response.body}");
     }
@@ -80,7 +78,8 @@ class _SignInState extends State<SignIn> {
     }
     //////////////////////////////////////
   }
- Future<void> _getProfile() async {
+
+  Future<void> _getProfile() async {
     //get token from pref
     var tokenString = prefs.getString('token');
     print(tokenString);
@@ -88,7 +87,7 @@ class _SignInState extends State<SignIn> {
     // print(token['token']);
 
     //http get profile
-    var url = Uri.parse('http://172.19.238.66:3001/users/current');
+    var url = Uri.parse('${ConfigIp.domain}/users/current');
     var response = await http.get(
       url,
       headers: {
@@ -104,22 +103,14 @@ class _SignInState extends State<SignIn> {
       print(response.body);
 
       Navigator.pushNamed(context, Nav.routeName,
-          arguments: UserArgumentModel(
-            body['user_id'],
-            body['role'],
-            body['tel'],
-            body['email'],
-            body['username'],
-            body['createdAt'],
-            body['updatedAt'],
-          ));
+          arguments: UserArgumentModel());
 
       // Navigator.pushNamed(
       //   context,
       //   '/launcher',
       // );
       print(body['username']);
-
+      print(body['user_id']);
       //save profile to pref
       await prefs.setString('profile', response.body);
     } else {
@@ -204,11 +195,10 @@ class _SignInState extends State<SignIn> {
   Widget loginButton() => Container(
         child: ElevatedButton(
           onPressed: () {
-                  setState(() {
-                  });
+            setState(() {});
 
-                  login();
-                },
+            login();
+          },
           child: Text('LOGIN'),
         ),
       );

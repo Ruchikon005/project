@@ -5,6 +5,7 @@ import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:khnomapp/config_ip.dart';
 import 'package:khnomapp/screens/signin_screen/signin.dart';
 import 'package:khnomapp/utility/my_style.dart';
 import 'package:http/http.dart' as http;
@@ -33,7 +34,7 @@ class _SignUpState extends State<SignUp> {
 
   Future register() async {
     // var url = "http://172.19.175.153/add/register.php";
-    var url = "http://172.19.238.66:3001/users/register";
+    var url = "${ConfigIp.domain}/users/register";
     http.Response response = await http.post(Uri.parse(url), body: {
       "username" : _username.text,
       "tel" : _tel.text,

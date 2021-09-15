@@ -1,7 +1,10 @@
 import 'dart:io';
-
+import 'dart:convert' as convert;
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:khnomapp/action/imageupload.dart';
+import 'package:khnomapp/config_ip.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class UploadImage extends StatefulWidget {
   static String rountName = '/UploadImage';
@@ -13,15 +16,32 @@ class UploadImage extends StatefulWidget {
 }
 
 class _UploadImageState extends State<UploadImage> {
+  static SharedPreferences prefs;
   File file;
   final ImagePicker _picker = ImagePicker();
-
   Map<String, dynamic> profile = {
+    'user_id': '',
     'username': '',
     'email': '',
-    'role': '',
-    'tel': ''
+    "role": ''
   };
+
+  @override
+  void initState() {
+    super.initState();
+    _getProfile();
+  }
+
+  Future _getProfile() async {
+    prefs = await SharedPreferences.getInstance();
+    var profileString = prefs.getString('profile');
+    print(profileString);
+    if (profileString != null) {
+      setState(() {
+        profile = convert.jsonDecode(profileString);
+      });
+    }
+  }
 
   Future<Null> chooseImage(ImageSource source) async {
     try {
@@ -38,7 +58,6 @@ class _UploadImageState extends State<UploadImage> {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -59,12 +78,24 @@ class _UploadImageState extends State<UploadImage> {
                 ElevatedButton(
                   onPressed: () => chooseImage(ImageSource.gallery),
                   child: CircleAvatar(
-                    backgroundImage: file == null
-                        ? AssetImage('assets/images/cookie_1.jpg')
+                    child: file == null
+                        ? Image.asset('assets/images/cookie_1.jpg')
                         : Image.file(file),
                     radius: 70,
                   ),
                 ),
+                SizedBox(
+                  height: 50,
+                ),
+                ElevatedButton(
+                    onPressed: () async {
+                      print(file.path);
+                      // print(tokenString);
+                      print(file);
+                      var res = await ImageUpload.upload(
+                          file.path, '${profile['user_id']}');
+                    },
+                    child: Text('save')),
               ],
             ),
           ),

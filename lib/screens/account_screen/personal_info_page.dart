@@ -30,9 +30,7 @@ class _PersonalInfoState extends State<PersonalInfo> {
   @override
   void initState() {
     super.initState();
-    // _initPref();
     _getProfile();
-    // _getToken();
   }
 
   _getProfile() async {

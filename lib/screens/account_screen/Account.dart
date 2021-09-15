@@ -3,6 +3,8 @@ import 'package:khnomapp/screens/account_screen/widget_account/manu_account.dart
 import 'package:khnomapp/screens/account_screen/widget_account/profile_bar.dart';
 
 class Account extends StatefulWidget {
+  static var routeName = '/Account';
+
   @override
   _AccountState createState() => _AccountState();
 }
