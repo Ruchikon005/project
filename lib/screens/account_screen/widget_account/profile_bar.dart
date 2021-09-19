@@ -19,7 +19,6 @@ class ProfileBar extends StatefulWidget {
 
 class _ProfileBarState extends State<ProfileBar> {
   static SharedPreferences prefs;
-  static String path;
   static var body;
 
   Map<String, dynamic> profile = {
@@ -39,8 +38,8 @@ class _ProfileBarState extends State<ProfileBar> {
   @override
   void initState() {
     super.initState();
-      _getProfile();
-      getImageDetail();
+    _getProfile();
+    // getImageDetail(path);
 
     // _getImageprofile();
   }
@@ -56,24 +55,27 @@ class _ProfileBarState extends State<ProfileBar> {
     }
   }
 
- void getImageDetail() async {
-    var url = Uri.parse(
-        '${ConfigIp.domain}/userimages/userimage/${profile['user_id']}');
+  // ignore: missing_return
+  Future<String> getImageDetail(String uid) async {
+    var url = Uri.parse('${ConfigIp.domain}/userimages/userimage/$uid');
     var response = await http.get(url);
     body = convert.jsonDecode(response.body);
     // await prefs.setString('ImageDetail', response.body);
     if (response.statusCode == 200) {
       print(body);
       print(body['image_path']);
-      setState(() {
-        path = '${body['image_path']}';
-        
-      });
+      uid = body['image_path'];
+      print(uid);
+      return uid;
     } else {
       print(response.body);
     }
   }
 
+  Future<String> getUse() async {
+    String url = await getImageDetail('${profile['user_id']}');
+    return url;
+  }
   // _getImageprofile() async {
   //   var imageString = prefs.getString('ImageDetail');
   //   print(imageString);
@@ -107,11 +109,7 @@ class _ProfileBarState extends State<ProfileBar> {
                   padding: const EdgeInsets.symmetric(horizontal: 20.0),
                   child: Row(
                     children: [
-                      CircleAvatar(
-                        backgroundImage:
-                            NetworkImage('${ConfigIp.domain}/${path}'),
-                        radius: 40,
-                      ),
+                      _profileImage(),
                       SizedBox(
                         width: 10.0,
                       ),
@@ -155,7 +153,7 @@ class _ProfileBarState extends State<ProfileBar> {
                                 side: BorderSide(width: 1, color: Colors.blue),
                               ),
                               onPressed: () => {
-                                getImageDetail(),
+                                // getImageDetail(),
                                 // print(body),
                                 // getImage(body)
                               },
@@ -176,6 +174,38 @@ class _ProfileBarState extends State<ProfileBar> {
           )
         ],
       ),
+    );
+  }
+
+  FutureBuilder<String> _profileImage() {
+    return FutureBuilder<String>(
+      future: getUse(),
+      builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+        List<Widget> children;
+        if (snapshot.hasData) {
+          children = <Widget>[
+            CircleAvatar(
+              backgroundImage:
+                  NetworkImage('${ConfigIp.domain}/${snapshot.data}'),
+              radius: 40,
+            ),
+          ];
+        } else {
+          children = const <Widget>[
+            CircleAvatar(
+              backgroundColor: Colors.white,
+              radius: 40,
+            ),
+          ];
+        }
+        return Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: children,
+          ),
+        );
+      },
     );
   }
 }

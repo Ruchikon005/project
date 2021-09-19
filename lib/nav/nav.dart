@@ -40,8 +40,8 @@ class _NavState extends State<Nav> {
             label: 'Home',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.shopping_cart_outlined),
-            label: 'Cart',
+            icon: Icon(Icons.location_on_sharp),
+            label: 'location',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.perm_identity_sharp),

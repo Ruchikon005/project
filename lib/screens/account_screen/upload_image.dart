@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:khnomapp/action/imageupload.dart';
 import 'package:khnomapp/config_ip.dart';
+import 'package:khnomapp/screens/account_screen/Account.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class UploadImage extends StatefulWidget {
@@ -75,12 +76,12 @@ class _UploadImageState extends State<UploadImage> {
           Center(
             child: Column(
               children: [
-                ElevatedButton(
-                  onPressed: () => chooseImage(ImageSource.gallery),
+                InkWell(
+                  onTap: () => chooseImage(ImageSource.gallery),
                   child: CircleAvatar(
-                    child: file == null
-                        ? Image.asset('assets/images/cookie_1.jpg')
-                        : Image.file(file),
+                    backgroundImage: file == null
+                        ? AssetImage('assets/images/cookie_1.jpg')
+                        : FileImage(file),
                     radius: 70,
                   ),
                 ),
@@ -94,6 +95,7 @@ class _UploadImageState extends State<UploadImage> {
                       print(file);
                       var res = await ImageUpload.upload(
                           file.path, '${profile['user_id']}');
+                      Navigator.popAndPushNamed(context, Account.routeName);
                     },
                     child: Text('save')),
               ],
