@@ -13,15 +13,16 @@ class _AccountState extends State<Account> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ProfileBar(),
-         MenuAccount(),
-        ],
-      ),
+        body: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ProfileBar(),
+              MenuAccount(),
+            ],
+          ),
+        ),
+      
     );
   }
 }
-
-

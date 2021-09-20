@@ -20,7 +20,7 @@ class _NavState extends State<Nav> {
     Account(),
   ];
 
-  void _onItemTap(int index) {
+  void _onItemTap(index) {
     setState(() {
       _selectedIndex = index;
     });

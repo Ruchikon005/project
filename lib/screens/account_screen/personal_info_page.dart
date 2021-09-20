@@ -3,7 +3,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert' as convert;
 
 class PersonalInfo extends StatefulWidget {
-  static String rountName = '/PersonalInfo';
+  static String routeName = '/PersonalInfo';
+
 
   const PersonalInfo({Key key}) : super(key: key);
 

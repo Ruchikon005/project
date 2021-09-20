@@ -3,6 +3,7 @@ import 'package:khnomapp/screens/account_screen/personal_info_page.dart';
 import 'package:khnomapp/screens/signin_screen/signin.dart';
 import 'package:khnomapp/screens/store_screen/create_store.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert' as convert;
 
 class MenuAccount extends StatefulWidget {
   const MenuAccount({
@@ -15,6 +16,33 @@ class MenuAccount extends StatefulWidget {
 
 class _MenuAccountState extends State<MenuAccount> {
 
+  static SharedPreferences prefs;
+
+  Map<String, dynamic> profile = {
+    'user_id': '',
+    'username': '',
+    'email': '',
+    "role": ''
+  };
+
+
+  @override
+  void initState() {
+    super.initState();
+    _getProfile();
+  }
+
+  void _getProfile() async {
+    prefs = await SharedPreferences.getInstance();
+    var profileString = prefs.getString('profile');
+    print(profileString);
+    if (profileString != null) {
+      setState(() {
+        profile = convert.jsonDecode(profileString);
+      });
+    }
+  }
+
   void _logout() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.remove('token');
@@ -25,7 +53,9 @@ class _MenuAccountState extends State<MenuAccount> {
     //     context, '/login', (Route<dynamic> route) => false);
     Navigator.of(context, rootNavigator: true)
         .pushNamedAndRemoveUntil(SignIn.routeName, (route) => false);
+
   }
+  
 
   @override
   Widget build(BuildContext context) {
@@ -36,12 +66,15 @@ class _MenuAccountState extends State<MenuAccount> {
            ListTile(
              title: Text('Create Store'),
              leading: Icon(Icons.list_alt_rounded),
-             onTap: () => Navigator.pushNamed(context, CreateStore.rountName),
+             onTap: () => {
+               print('${profile['user_id']}'),
+               normalDialog(context,'${profile['user_id']}')},
+            //  Navigator.pushNamed(context, CreateStore.rountName),
            ),
            ListTile(
              title: Text('profile'),
              leading: Icon(Icons.list_alt_rounded),
-             onTap: () => Navigator.pushNamed(context, PersonalInfo.rountName),
+             onTap: () => Navigator.pushNamed(context, PersonalInfo.routeName),
            ),
            ListTile(
              title: Text('history'),
@@ -65,6 +98,7 @@ class _MenuAccountState extends State<MenuAccount> {
              leading: Icon(Icons.logout),
              onTap: () => _logout(),
            ),
+           
           ],
         ),
       ),

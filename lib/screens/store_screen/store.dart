@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 
 class Store extends StatefulWidget {
-  static var rounte = '/store';
+  static String routeName = '/store';
 
-  static String routeName;
 
   Store({Key key}) : super(key: key);
 

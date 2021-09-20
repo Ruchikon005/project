@@ -1,79 +1,69 @@
 import 'package:flutter/material.dart';
-import 'package:khnomapp/action/create_store.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:convert' as convert;
+import 'package:khnomapp/action/create_sotre.dart';
+import 'package:khnomapp/screens/account_screen/Account.dart';
+import 'package:khnomapp/screens/store_screen/store.dart';
 
-class CreateStore extends StatefulWidget {
-  static var rountName = '/create_store';
 
-  CreateStore({Key key}) : super(key: key);
-
-  @override
-  _CreateStoreState createState() => _CreateStoreState();
-}
-
-class _CreateStoreState extends State<CreateStore> {
+Future<Null> normalDialog(BuildContext context, String uid) async {
   TextEditingController _storename = TextEditingController();
-
-  static SharedPreferences prefs;
-
-  Map<String, dynamic> profile = {
-    'user_id': '',
-    'username': '',
-    'email': '',
-    "role": ''
-  };
-
-  @override
-  void initState() {
-    super.initState();
-    _getProfile();
-
-    // _getImageprofile();
-  }
-
-  void _getProfile() async {
-    prefs = await SharedPreferences.getInstance();
-    var profileString = prefs.getString('profile');
-    print(profileString);
-    if (profileString != null) {
-      setState(() {
-        profile = convert.jsonDecode(profileString);
-      });
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: Card(
-          child: Container(
-            child: Column(
+  final ButtonStyle style = ElevatedButton.styleFrom(
+      textStyle: const TextStyle(fontSize: 18), fixedSize: Size(100, 25));
+  print("status");
+  print(uid);
+  String _uid = uid;
+  showDialog(
+      context: context,
+      builder: (context) => Center(
+            child: SimpleDialog(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20)),
               children: [
-                Text(
-                  'Create Store',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 30, vertical: 20),
+                  height: 250,
+                  child: Column(
+                    children: [
+                      Text(
+                        'Create store',
+                        style: TextStyle(
+                            fontSize: 25, fontWeight: FontWeight.bold),
+                      ),
+                      SizedBox(height: 30),
+                      TextFormField(
+                        controller: _storename,
+                        textAlign: TextAlign.center,
+                        decoration: InputDecoration(
+                          labelText: 'store Name',
+                        ),
+                        style: TextStyle(fontSize: 18),
+                      ),
+                      SizedBox(height: 40),
+                      Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            ElevatedButton(
+                              style: style,
+                              onPressed: () =>
+                                  Navigator.pop(context, Account.routeName),
+                              child: Text('CANCEL'),
+                            ),
+                            SizedBox(width: 10),
+                            ElevatedButton(
+                              style: style,
+                              onPressed: () {
+
+                                print("ontap");
+                                print(_uid);
+                                createstore(_uid, _storename.text);
+                                Navigator.pushNamed(context, Store.routeName);
+                              },
+                              child: Text('Okay'),
+                            )
+                          ])
+                    ],
+                  ),
                 ),
-                SizedBox(
-                  height: 50,
-                ),
-                TextFormField(
-                  controller: _storename,
-                  decoration: InputDecoration(hintText: 'Store Name'),
-                ),
-                SizedBox(
-                  height: 50,
-                ),
-                ElevatedButton(
-                    onPressed: () =>
-                        {print(_storename.text),create('${profile['user_id']}', _storename.text)},
-                    child: Text('Create')),
               ],
             ),
-          ),
-        ),
-      ),
-    );
-  }
+          ));
 }

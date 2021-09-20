@@ -88,6 +88,10 @@ class _ProfileBarState extends State<ProfileBar> {
   //   }
   // }
 
+  onGoBack(dynamic value) {
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -109,7 +113,30 @@ class _ProfileBarState extends State<ProfileBar> {
                   padding: const EdgeInsets.symmetric(horizontal: 20.0),
                   child: Row(
                     children: [
-                      _profileImage(),
+                      Stack(
+                        children: [
+                          _profileImage(),
+                          Positioned(
+                            bottom: 0,
+                            right: 0,
+                            child: Container(
+                              height: 28,
+                              width: 28,
+                              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20) ),
+                              child: IconButton(
+                                padding: EdgeInsets.all(0),
+                                icon: Icon(
+                                  Icons.mode_edit_outlined,
+                                  color: Colors.grey,
+                                ),
+                                onPressed: () => Navigator.pushNamed(
+                                        context, UploadImage.routeName)
+                                    .then(onGoBack),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                       SizedBox(
                         width: 10.0,
                       ),
@@ -130,39 +157,6 @@ class _ProfileBarState extends State<ProfileBar> {
                           ),
                           SizedBox(
                             height: 5.0,
-                          ),
-                          Container(
-                            height: 20,
-                            child: ElevatedButton(
-                              style: OutlinedButton.styleFrom(
-                                side: BorderSide(width: 1, color: Colors.blue),
-                              ),
-                              onPressed: () => Navigator.pushNamed(
-                                  context, UploadImage.rountName),
-                              child: Text(
-                                'Edit',
-                                style: TextStyle(
-                                    fontSize: 12.0, color: Colors.blue),
-                              ),
-                            ),
-                          ),
-                          Container(
-                            height: 20,
-                            child: ElevatedButton(
-                              style: OutlinedButton.styleFrom(
-                                side: BorderSide(width: 1, color: Colors.blue),
-                              ),
-                              onPressed: () => {
-                                // getImageDetail(),
-                                // print(body),
-                                // getImage(body)
-                              },
-                              child: Text(
-                                'Edit2',
-                                style: TextStyle(
-                                    fontSize: 12.0, color: Colors.blue),
-                              ),
-                            ),
                           ),
                         ],
                       ),
@@ -187,14 +181,14 @@ class _ProfileBarState extends State<ProfileBar> {
             CircleAvatar(
               backgroundImage:
                   NetworkImage('${ConfigIp.domain}/${snapshot.data}'),
-              radius: 40,
+              radius: 45,
             ),
           ];
         } else {
           children = const <Widget>[
             CircleAvatar(
               backgroundColor: Colors.white,
-              radius: 40,
+              radius: 45,
             ),
           ];
         }

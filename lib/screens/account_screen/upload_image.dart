@@ -4,11 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:khnomapp/action/imageupload.dart';
 import 'package:khnomapp/config_ip.dart';
+import 'package:khnomapp/nav/nav.dart';
 import 'package:khnomapp/screens/account_screen/Account.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class UploadImage extends StatefulWidget {
-  static String rountName = '/UploadImage';
+  static String routeName = '/UploadImage';
 
   const UploadImage({Key key}) : super(key: key);
 
@@ -95,7 +96,9 @@ class _UploadImageState extends State<UploadImage> {
                       print(file);
                       var res = await ImageUpload.upload(
                           file.path, '${profile['user_id']}');
-                      Navigator.popAndPushNamed(context, Account.routeName);
+                      // Navigator.popUntil(
+                      //     context, ModalRoute.withName(Account.routeName));
+                      Navigator.pop(context, true);
                     },
                     child: Text('save')),
               ],
