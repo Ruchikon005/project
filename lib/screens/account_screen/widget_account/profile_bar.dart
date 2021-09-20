@@ -76,17 +76,6 @@ class _ProfileBarState extends State<ProfileBar> {
     String url = await getImageDetail('${profile['user_id']}');
     return url;
   }
-  // _getImageprofile() async {
-  //   var imageString = prefs.getString('ImageDetail');
-  //   print(imageString);
-  //   if (imageString != null) {
-  //     setState(() {
-  //       image = convert.jsonDecode(imageString);
-  //       print('object');
-  //       print(image['image_part']);
-  //     });
-  //   }
-  // }
 
   onGoBack(dynamic value) {
     setState(() {});

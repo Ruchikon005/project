@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:khnomapp/action/create_sotre.dart';
 import 'package:khnomapp/screens/account_screen/Account.dart';
 import 'package:khnomapp/screens/store_screen/store.dart';
+import 'package:khnomapp/screens/store_screen/widget/nav_store.dart';
 
 
 Future<Null> normalDialog(BuildContext context, String uid) async {
@@ -51,7 +52,6 @@ Future<Null> normalDialog(BuildContext context, String uid) async {
                             ElevatedButton(
                               style: style,
                               onPressed: () {
-
                                 print("ontap");
                                 print(_uid);
                                 createstore(_uid, _storename.text);
