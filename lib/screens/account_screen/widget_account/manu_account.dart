@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:khnomapp/config_ip.dart';
+import 'package:khnomapp/model/openstore_model.dart';
 import 'package:khnomapp/screens/account_screen/personal_info_page.dart';
 import 'package:khnomapp/screens/signin_screen/signin.dart';
 import 'package:khnomapp/screens/store_screen/create_store.dart';
+import 'package:khnomapp/screens/store_screen/store.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert' as convert;
+import 'package:http/http.dart' as http;
 
 class MenuAccount extends StatefulWidget {
   const MenuAccount({
@@ -17,6 +21,7 @@ class MenuAccount extends StatefulWidget {
 class _MenuAccountState extends State<MenuAccount> {
 
   static SharedPreferences prefs;
+  static var body;
 
   Map<String, dynamic> profile = {
     'user_id': '',
@@ -55,6 +60,32 @@ class _MenuAccountState extends State<MenuAccount> {
         .pushNamedAndRemoveUntil(SignIn.routeName, (route) => false);
 
   }
+
+  // ignore: missing_return
+  Future<String> getStoreDetail(String uid) async {
+    var url = Uri.parse('${ConfigIp.domain}/stores/ownerfindstore/$uid');
+    var response = await http.get(url);
+    body = convert.jsonDecode(response.body);
+    // await prefs.setString('ImageDetail', response.body);
+    if (response.statusCode == 200) {
+      print(body);
+      print(body['store_id']);
+      String stid = '${body['store_id']}';
+      print(stid);
+      return stid;
+    } else {
+      print(response.body);
+    }
+  }
+
+  Future<String> getStore() async {
+    String data = await getStoreDetail('${profile['user_id']}');
+    return data;
+  }
+
+  onGoBack(dynamic value) {
+    setState(() {});
+  }
   
 
   @override
@@ -63,14 +94,7 @@ class _MenuAccountState extends State<MenuAccount> {
       child: Container(
         child: Column(
           children: <Widget>[
-           ListTile(
-             title: Text('Create Store'),
-             leading: Icon(Icons.list_alt_rounded),
-             onTap: () => {
-               print('${profile['user_id']}'),
-               normalDialog(context,'${profile['user_id']}')},
-            //  Navigator.pushNamed(context, CreateStore.rountName),
-           ),
+           _manageStore(),
            ListTile(
              title: Text('profile'),
              leading: Icon(Icons.list_alt_rounded),
@@ -102,6 +126,51 @@ class _MenuAccountState extends State<MenuAccount> {
           ],
         ),
       ),
+    );
+  }
+
+  FutureBuilder<String> _manageStore() {
+    return FutureBuilder<String>(
+      future: getStore(),
+      builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+        List<Widget> children;
+        if (snapshot.hasData) {
+          print(snapshot);
+          children = <Widget>[
+            ListTile(
+             title: Text('Store'),
+             tileColor: Colors.red[400],
+             leading: Icon(Icons.add_business_rounded),
+             onTap: () => {
+               print('gotostore${profile['user_id']}'),
+               Navigator.pushNamed(context, Store.routeName,arguments: OpenStore(1))},
+            //  Navigator.pushNamed(context, CreateStore.rountName),
+           ),
+          ];
+        } else {
+          // print('manage');
+          // print(snapshot);
+
+          children = <Widget>[
+            ListTile(
+             title: Text('Create Store'),
+             tileColor: Colors.red[400],
+             leading: Icon(Icons.add_business_rounded),
+             onTap: () => {
+               print('${profile['user_id']}'),
+               normalDialog(context,'${profile['user_id']}')},
+            //  Navigator.pushNamed(context, CreateStore.rountName),
+           ),
+          ];
+        }
+        return Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: children,
+          ),
+        );
+      },
     );
   }
 }

@@ -8,6 +8,7 @@ import 'package:khnomapp/screens/product_detail_screen/product_detail.dart';
 import 'package:khnomapp/screens/signin_screen/signin.dart';
 import 'package:khnomapp/screens/signup_screen/signup.dart';
 import 'package:khnomapp/screens/store_screen/pages/add_product.dart';
+import 'package:khnomapp/screens/store_screen/pages/my_product_list.dart';
 import 'package:khnomapp/screens/store_screen/pages/order.dart';
 import 'package:khnomapp/screens/store_screen/store.dart';
 import 'package:khnomapp/screens/store_screen/widget/nav_store.dart';
@@ -25,4 +26,5 @@ final Map<String, WidgetBuilder> routes = {
   Store.routeName: (context) => Store(),
   AddProduct.routeName: (context) => AddProduct(),
   Order.routeName: (context) => Order(),
+  MyProduct.routeName: (context) => MyProduct(),
 };

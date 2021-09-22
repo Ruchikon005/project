@@ -4,8 +4,11 @@ import 'package:flutter/material.dart';
 import 'dart:convert' as convert;
 import 'package:http/http.dart' as http;
 import 'package:khnomapp/config_ip.dart';
+import 'package:khnomapp/model/openstore_model.dart';
 import 'package:khnomapp/screens/store_screen/pages/add_product.dart';
+import 'package:khnomapp/screens/store_screen/pages/my_product_list.dart';
 import 'package:khnomapp/screens/store_screen/pages/order.dart';
+import 'package:khnomapp/utility/my_style.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Store extends StatefulWidget {
@@ -20,7 +23,7 @@ class Store extends StatefulWidget {
 int sharedValue = 0;
 
 List<Widget> _widgetOption = <Widget>[
-  AddProduct(),
+  MyProduct(),
   Order(),
 ];
 
@@ -34,7 +37,6 @@ class _StoreState extends State<Store> {
     'email': '',
     "role": ''
   };
-
 
   @override
   void initState() {
@@ -79,9 +81,32 @@ class _StoreState extends State<Store> {
     setState(() {});
   }
 
+   // ignore: missing_return
+  Future<String> getStoreDetail(String uid) async {
+    var url = Uri.parse('${ConfigIp.domain}/stores/ownerfindstore/$uid');
+    var response = await http.get(url);
+    body = convert.jsonDecode(response.body);
+    // await prefs.setString('ImageDetail', response.body);
+    if (response.statusCode == 200) {
+      print(body);
+      print(body['store_name']);
+      String stid = body['store_name'];
+      print(stid);
+      return stid;
+    } else {
+      print(response.body);
+    }
+  }
+
+  Future<String> getStore() async {
+    String data = await getStoreDetail('${profile['user_id']}');
+    return data;
+  }
+
   @override
   Widget build(BuildContext context) {
     final weightbar = MediaQuery.of(context).size.width;
+    final args = ModalRoute.of(context).settings.arguments as OpenStore;
 
     return Scaffold(
       appBar: AppBar(
@@ -94,9 +119,9 @@ class _StoreState extends State<Store> {
           ),
           onPressed: () {
             var count = 0;
-            Navigator.popUntil(context, (route) {
-              return count++ == 2;
-            });
+            // ignore: unrelated_type_equality_checks
+            Navigator.popUntil(context, (route) => args == 1 ? count++ == 1 : count++ == 2);
+            
           },
         ),
         actions: [],
@@ -107,80 +132,122 @@ class _StoreState extends State<Store> {
         ),
       ),
       backgroundColor: Colors.blueGrey,
-      body: SingleChildScrollView(
-        child: Column(children: [
-          Container(
-            height: 200,
-            color: Colors.white,
-            width: double.infinity,
-            child: Stack(children: [
-              Column(children: [
-                SizedBox(height: 40),
-                _profileImage(),
-                SizedBox(height: 20),
-                Container(
-                  alignment: Alignment.center,
-                  child: Text(
-                    'Store name',
-                    style: TextStyle(fontSize: 20),
-                  ),
-                ),
-              ]),
-            ]),
-          ),
-          CupertinoSegmentedControl(
-            unselectedColor: Colors.red.withOpacity(0),
-            selectedColor: Colors.red.withOpacity(0),
-            pressedColor: Colors.red.withOpacity(0),
-            borderColor: Colors.red.withOpacity(0),
-            children: {
-              0: Container(
-                alignment: Alignment.center,
-                height: 50,
-                width: weightbar * 0.8,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.only(
-                    topLeft: const Radius.circular(20.0),
-                    bottomLeft: const Radius.circular(20.0),
-                  ),
-                  color: sharedValue == 0 ? Colors.blue[100] : Colors.white,
-                ),
-                padding: EdgeInsets.all(8),
-                child: Text(
-                  'Product',
-                  style: TextStyle(color: Colors.black, fontSize: 18),
+      body: Stack(
+        children: [
+          SingleChildScrollView(
+            child: Column(children: [
+              Container(
+                height: 200,
+                color: Colors.white,
+                width: double.infinity,
+                child: Stack(children: [
+                  Column(children: [
+                    SizedBox(height: 40),
+                    _profileImage(),
+                    SizedBox(height: 20),
+                    _manageStore(),
+                  ]),
+                ]),
+              ),
+              Container(
+                padding: EdgeInsets.all(10),
+                color: Colors.white,
+                child: CupertinoSegmentedControl(
+                  unselectedColor: Colors.red.withOpacity(0),
+                  selectedColor: Colors.red.withOpacity(0),
+                  pressedColor: Colors.red.withOpacity(0),
+                  borderColor: Colors.red.withOpacity(0),
+                  children: {
+                    0: Container(
+                      alignment: Alignment.center,
+                      height: 50,
+                      width: weightbar * 0.8,
+                      decoration: BoxDecoration(
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black38,
+                            blurRadius: 4,
+                            offset: Offset(0, 2), // Shadow position
+                          ),
+                        ],
+                        borderRadius: BorderRadius.only(
+                          topLeft: const Radius.circular(20.0),
+                          bottomLeft: const Radius.circular(20.0),
+                        ),
+                        color:
+                            sharedValue == 0 ? Colors.blue[100] : Colors.white,
+                      ),
+                      padding: EdgeInsets.all(8),
+                      child: Text(
+                        'Product',
+                        style: TextStyle(color: Colors.black, fontSize: 18),
+                      ),
+                    ),
+                    1: Container(
+                      alignment: Alignment.center,
+                      height: 50,
+                      width: weightbar * 0.8,
+                      decoration: BoxDecoration(
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black38,
+                            blurRadius: 4,
+                            offset: Offset(0, 2), // Shadow position
+                          ),
+                        ],
+                        borderRadius: BorderRadius.only(
+                          topRight: const Radius.circular(20.0),
+                          bottomRight: const Radius.circular(20.0),
+                        ),
+                        color:
+                            sharedValue == 1 ? Colors.blue[100] : Colors.white,
+                      ),
+                      // color: sharedValue == 1 ? Colors.blue[100] : Colors.white,
+                      padding: EdgeInsets.all(8),
+                      child: Text(
+                        'Oder',
+                        style: TextStyle(color: Colors.black, fontSize: 18),
+                      ),
+                    )
+                  },
+                  onValueChanged: (int val) {
+                    setState(() {
+                      sharedValue = val;
+                    });
+                  },
+                  groupValue: sharedValue,
                 ),
               ),
-              1: Container(
-                alignment: Alignment.center,
-                height: 50,
-                width: weightbar * 0.8,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.only(
-                    topRight: const Radius.circular(20.0),
-                    bottomRight: const Radius.circular(20.0),
-                  ),
-                  color: sharedValue == 1 ? Colors.blue[100] : Colors.white,
-                ),
-                // color: sharedValue == 1 ? Colors.blue[100] : Colors.white,
-                padding: EdgeInsets.all(8),
-                child: Text(
-                  'Oder',
-                  style: TextStyle(color: Colors.black, fontSize: 18),
-                ),
-              )
-            },
-            onValueChanged: (int val) {
-              setState(() {
-                sharedValue = val;
-              });
-            },
-            groupValue: sharedValue,
+              Container(
+                child: _widgetOption[sharedValue],
+              ),
+            ]),
           ),
           Container(
-            child: _widgetOption[sharedValue],
-          )
-        ]),
+            alignment: Alignment.bottomCenter,
+            padding: EdgeInsets.all(30),
+            child: sharedValue == 0
+                ? InkWell(
+                    onTap: () {
+                      Navigator.pushNamed(context, AddProduct.routeName).then(onGoBack);
+                    },
+                    child: Container(
+                      alignment: Alignment.center,
+                      height: 50.0,
+                      width: weightbar * 0.4,
+                      decoration: BoxDecoration(
+                          color: MyStyle().colorCustom,
+                          borderRadius: BorderRadius.circular(30)),
+                      child: Text('ADD PRODUCT',
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold)),
+                    ),
+                  )
+                : null,
+          ),
+        ],
       ),
     );
   }
@@ -204,6 +271,47 @@ class _StoreState extends State<Store> {
               backgroundColor: Colors.white,
               radius: 45,
             ),
+          ];
+        }
+        return Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: children,
+          ),
+        );
+      },
+    );
+  }
+
+  FutureBuilder<String> _manageStore() {
+    return FutureBuilder<String>(
+      future: getStore(),
+      builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+        List<Widget> children;
+        if (snapshot.hasData) {
+          print(snapshot);
+          children = <Widget>[
+            Container(
+                      alignment: Alignment.center,
+                      child: Text(
+                        snapshot.data,
+                        style: TextStyle(fontSize: 20),
+                      ),
+                    ),
+          ];
+        } else {
+          print('manage2');
+          // print(snapshot);
+
+          children = <Widget>[
+            Container(
+                      alignment: Alignment.center,
+                      child: Text(
+                        'Store name',
+                        style: TextStyle(fontSize: 20),
+                      ),
+                    ),
           ];
         }
         return Center(

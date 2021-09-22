@@ -28,13 +28,6 @@ class _ProfileBarState extends State<ProfileBar> {
     "role": ''
   };
 
-  Map<String, dynamic> image = {
-    'userimage_id': '',
-    'type': '',
-    'image_path': '',
-    'data': '',
-  };
-
   @override
   void initState() {
     super.initState();
@@ -64,9 +57,9 @@ class _ProfileBarState extends State<ProfileBar> {
     if (response.statusCode == 200) {
       print(body);
       print(body['image_path']);
-      uid = body['image_path'];
-      print(uid);
-      return uid;
+      String urlimage = body['image_path'];
+      print(urlimage);
+      return urlimage;
     } else {
       print(response.body);
     }
