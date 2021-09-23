@@ -3,6 +3,12 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:khnomapp/config_ip.dart';
 import 'package:http/http.dart' as http;
+import 'package:khnomapp/model/myproduct_model.dart';
+import 'package:khnomapp/model/product_model.dart';
+import 'package:khnomapp/screens/product_detail_screen/product_detail.dart';
+import 'package:khnomapp/utils/format.dart';
+import 'package:khnomapp/viewmodels/myproduct_list.dart';
+import 'package:khnomapp/viewmodels/product_model.dart';
 import 'dart:convert' as convert;
 
 import 'package:shared_preferences/shared_preferences.dart';
@@ -17,6 +23,8 @@ class MyProduct extends StatefulWidget {
 }
 
 class _MyProductState extends State<MyProduct> {
+  // List<ProductModel>  _productViewModel = MyProductViewModel.getMyProduct();
+   
   static var body;
   static SharedPreferences prefs;
   Map<String, dynamic> profile = {
@@ -33,6 +41,8 @@ class _MyProductState extends State<MyProduct> {
     
     onGoBack(dynamic);
   }
+
+  
 
   onGoBack(dynamic value) {
     setState(() {});
@@ -99,31 +109,38 @@ class _MyProductState extends State<MyProduct> {
       print(response.reasonPhrase);
     }return data.toString();
   }
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        children: [
-          Container(height: 500, color: Colors.white,child: Product(),),
-        ],
-      ),
-    );
-  }
-
-   // ignore: non_constant_identifier_names
+  // ignore: non_constant_identifier_names
    FutureBuilder<String> Product() {
     return FutureBuilder<String>(
-      future: getproduct(),
+      future: getStore(),
       builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
         List<Widget> children;
         print(snapshot);
         if (snapshot.hasData) {
 
           children = <Widget>[
-            Text(snapshot.data),
-          ];
+            Column(
+        children: [
+          GridView.builder(
+            padding: EdgeInsets.all(6),
+            shrinkWrap: true,
+            physics: NeverScrollableScrollPhysics(),
+            itemCount: MyProductViewModel.getMyProduct('${snapshot.data}').length,
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              childAspectRatio: 0.75,
+              crossAxisCount: 2,
+              mainAxisSpacing: 6,
+              crossAxisSpacing: 6,
+            ),
+            itemBuilder: (BuildContext context, int index) {
+              return ProductItemCard(MyProductViewModel.getMyProduct('${snapshot.data}')[index], index);
+            },
+          ),
+          // ignore: dead_code
+          false ? SizedBox(height: 150) : BottomLoader(),
+        ],
+      ),
+      ];
         } else {
           // print(snapshot.hasData);
           children = const <Widget>[
@@ -140,4 +157,203 @@ class _MyProductState extends State<MyProduct> {
       },
     );
   }
+
+
+  @override
+  Widget build(BuildContext context) {
+    
+    return Container(
+      color: Colors.grey[200],
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Product(),
+          // _buildProductList(),
+        ],
+      ),
+    );
+    
+  }
+  
+
+  Column _buildProductList() => Column(
+        children: [
+          GridView.builder(
+            padding: EdgeInsets.all(6),
+            shrinkWrap: true,
+            physics: NeverScrollableScrollPhysics(),
+            // itemCount: MyProductViewModel.getMyProduct( ).length,
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              childAspectRatio: 0.75,
+              crossAxisCount: 2,
+              mainAxisSpacing: 6,
+              crossAxisSpacing: 6,
+            ),
+            itemBuilder: (BuildContext context, int index) {
+              // return ProductItemCard(MyProductViewModel.getMyProduct()[index], index);
+            },
+          ),
+          // ignore: dead_code
+          false ? SizedBox(height: 150) : BottomLoader(),
+        ],
+      );
 }
+
+class ProductItemCard extends StatelessWidget {
+  final ProductModel product;
+  final int index;
+
+  const ProductItemCard(this.product, this.index);
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints constraints) {
+        return GestureDetector(
+          onTap: () => Navigator.pushNamed(
+            context,
+            ProductDetail.routeName,
+            arguments: ProductDetailArguments(product:product),
+          ),
+          // {
+          //   print('${index}');
+          //   print('click');
+          //   Navigator.push(
+          //     context,
+          //     MaterialPageRoute(
+          //       builder: (context) => ProductDetail(),
+          //     ),
+
+          //   );
+          // },
+          child: Stack(
+            children: [
+              Container(
+                color: Colors.white,
+                child: Column(
+                  children: [
+                    _buildProductImage(constraints.maxHeight),
+                    _buildProductInfo(),
+                  ],
+                ),
+              ),
+              _buildProductPrice(),
+              _buildProductSold(),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Stack _buildProductImage(double maxHeight) {
+    return Stack(
+      children: <Widget>[
+        Image.asset(
+          product.image,
+          height: maxHeight - 82,
+          width: double.infinity,
+          fit: BoxFit.cover,
+        ),
+        // if (product.discountPercentage != 0) _buildDiscount(),
+        // if (product.mall) _buildMall(),
+        // if (product.shopRecommended) _buildShopRecommended(),
+      ],
+    );
+  }
+
+  Padding _buildProductInfo() => Padding(
+        padding: EdgeInsets.all(8),
+        child: Column(
+          children: [
+            Container(
+              alignment: Alignment.bottomLeft,
+              child: _buildName(),
+            ),
+            SizedBox(height: 12),
+          ],
+        ),
+      );
+
+  Text _buildName() => Text(
+        product.name,
+        maxLines: 2,
+        overflow: TextOverflow.ellipsis,
+      );
+
+  RichText _buildPrice() => RichText(
+        text: TextSpan(
+          text: '\$ ',
+          style: TextStyle(
+            color: Colors.deepOrange,
+            fontSize: 12,
+          ),
+          children: <TextSpan>[
+            TextSpan(
+              text: '${Format().currency(product.price, decimal: false)}',
+              style: TextStyle(
+                fontSize: 16,
+              ),
+            ),
+          ],
+        ),
+      );
+
+  Text _buildSold() => Text(
+        "ขายได้ ${product.sold} ชิ้น",
+        style: TextStyle(
+          fontSize: 10,
+        ),
+      );
+
+  Positioned _buildProductPrice() => Positioned(
+        bottom: 0,
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Row(
+            children: [
+              _buildPrice(),
+            ],
+          ),
+        ),
+      );
+
+  Positioned _buildProductSold() => Positioned(
+        bottom: 0,
+        right: 0,
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Row(
+            children: [
+              _buildSold(),
+            ],
+          ),
+        ),
+      );
+}
+
+class BottomLoader extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: EdgeInsets.only(top: 12, bottom: 22),
+      width: double.infinity,
+      alignment: Alignment.center,
+      child: Center(
+        child: Text(
+          "กำลังโหลด",
+          style: TextStyle(
+            color: Colors.deepOrange,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+
+
+
+  
+

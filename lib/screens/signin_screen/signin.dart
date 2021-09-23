@@ -21,7 +21,6 @@ class SignIn extends StatefulWidget {
 class _SignInState extends State<SignIn> {
   TextEditingController _email = TextEditingController();
   TextEditingController _password = TextEditingController();
-
   static SharedPreferences prefs;
 
   _initPref() async {
@@ -36,7 +35,6 @@ class _SignInState extends State<SignIn> {
 
   final success = SnackBar(content: Text('Login succeded!'));
   final error = SnackBar(content: Text('Wrong email or password!'));
-
   final _formKey = GlobalKey<FormState>();
 
   Future login() async {
@@ -50,15 +48,10 @@ class _SignInState extends State<SignIn> {
 
     if (response.statusCode == 200) {
       jsonResponse = json.decode(response.body);
-
       print("Response status: ${response.statusCode}");
-
       print("Response status: ${response.body}");
 
       if (jsonResponse != null) {
-        // setState(() {
-        // });
-
         prefs.setString("token", jsonResponse['token']);
         print(prefs.getString('token'));
         _getProfile();
@@ -71,20 +64,15 @@ class _SignInState extends State<SignIn> {
 
     if (jsonResponse['token'] != null) {
       ScaffoldMessenger.of(context).showSnackBar(success);
-      // Navigator.of(context).pushReplacement(
-      //     MaterialPageRoute(builder: (context) => Home()));
     } else {
       ScaffoldMessenger.of(context).showSnackBar(error);
     }
-    //////////////////////////////////////
   }
 
   Future<void> _getProfile() async {
     //get token from pref
     var tokenString = prefs.getString('token');
     print(tokenString);
-    // var token = convert.jsonDecode(tokenString);
-    // print(token['token']);
 
     //http get profile
     var url = Uri.parse('${ConfigIp.domain}/users/current');
@@ -93,7 +81,7 @@ class _SignInState extends State<SignIn> {
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
-        'Authorization': 'Bearer ${tokenString}',
+        'Authorization': 'Bearer $tokenString',
       },
     );
     var body = convert.jsonDecode(response.body);
@@ -101,18 +89,14 @@ class _SignInState extends State<SignIn> {
     if (response.statusCode == 200) {
       print('ok');
       print(response.body);
-
       Navigator.pushNamed(context, Nav.routeName,
           arguments: UserArgumentModel());
-
-      // Navigator.pushNamed(
-      //   context,
-      //   '/launcher',
-      // );
       print(body['username']);
       print(body['user_id']);
+
       //save profile to pref
       await prefs.setString('profile', response.body);
+
     } else {
       print('fail');
       print(body['message']);
