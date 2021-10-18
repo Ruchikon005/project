@@ -1,5 +1,5 @@
 class UserArgumentModel {
-  String user_id;
+  int user_id;
   String role;
   String tel;
   String email;

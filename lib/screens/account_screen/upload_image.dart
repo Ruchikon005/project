@@ -58,6 +58,60 @@ class _UploadImageState extends State<UploadImage> {
     } catch (e) {}
   }
 
+  void _showPicker(context) {
+    showModalBottomSheet(
+        context: context,
+        builder: (BuildContext bc) {
+          return SafeArea(
+            child: Container(
+              child: new Wrap(
+                children: <Widget>[
+                  new ListTile(
+                      leading: new Icon(Icons.photo_library),
+                      title: new Text('Photo Library'),
+                      onTap: () {
+                        _imgFromGallery();
+                        Navigator.of(context).pop();
+                      }),
+                  new ListTile(
+                    leading: new Icon(Icons.photo_camera),
+                    title: new Text('Camera'),
+                    onTap: () {
+                      _imgFromCamera();
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ],
+              ),
+            ),
+          );
+        });
+  }
+
+  _imgFromCamera() async {
+    XFile image = await _picker.pickImage(
+      source: ImageSource.camera,
+      maxWidth: 800.0,
+      maxHeight: 800.0,
+    );
+
+    setState(() {
+      file = File(image.path);
+    });
+  }
+
+  _imgFromGallery() async {
+    XFile image = await _picker.pickImage(
+      source: ImageSource.gallery,
+      maxWidth: 800.0,
+      maxHeight: 800.0,
+    );
+
+    setState(() {
+      file = File(image.path);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -78,13 +132,15 @@ class _UploadImageState extends State<UploadImage> {
             child: Column(
               children: [
                 InkWell(
-                  onTap: () => chooseImage(ImageSource.gallery),
-                  child: CircleAvatar(
-                    backgroundImage: file == null
-                        ? AssetImage('assets/images/cookie_1.jpg')
-                        : FileImage(file),
-                    radius: 70,
-                  ),
+                  onTap: () => _showPicker(context),
+                  child: file == null
+                      ? CircleAvatar(
+                        backgroundColor: Colors.grey.shade300,
+                          child: Icon(Icons.add_a_photo_outlined,color: Colors.white,size: 50,),
+                          radius: 70,
+                        )
+                      : CircleAvatar(
+                          backgroundImage: FileImage(file), radius: 70),
                 ),
                 SizedBox(
                   height: 50,

@@ -16,4 +16,8 @@ class ProductModel {
     this.image,
     this.sold = 0,
   });
+
+  
+
+
 }

@@ -5,6 +5,7 @@ import 'package:khnomapp/config_ip.dart';
 import 'package:http/http.dart' as http;
 import 'package:khnomapp/model/myproduct_model.dart';
 import 'package:khnomapp/model/product_model.dart';
+import 'package:khnomapp/model/productfood_model.dart';
 import 'package:khnomapp/screens/product_detail_screen/product_detail.dart';
 import 'package:khnomapp/utils/format.dart';
 import 'package:khnomapp/viewmodels/myproduct_list.dart';
@@ -24,7 +25,7 @@ class MyProduct extends StatefulWidget {
 
 class _MyProductState extends State<MyProduct> {
   // List<ProductModel>  _productViewModel = MyProductViewModel.getMyProduct();
-   
+  List<FoodModel>foodmodels = []; 
   static var body;
   static SharedPreferences prefs;
   Map<String, dynamic> profile = {
@@ -92,73 +93,30 @@ class _MyProductState extends State<MyProduct> {
   // ignore: missing_return
   Future<String> getproduct() async {
     var data;
-    // print(await getStore());
     var request = http.MultipartRequest(
         'GET', Uri.parse('${ConfigIp.domain}/products/productlist/${await getStore()}'));
 
     http.StreamedResponse response = await request.send();
 
     if (response.statusCode == 200) {
-      // print(await response.stream.bytesToString());
-      // body = await response.stream.bytesToString();
       data = await response.stream.bytesToString();
       print('data................');
       print(data);
-      
+
+      for(var map in data){
+        FoodModel foodModel = FoodModel.fromJson(map);
+        setState(() {
+          foodmodels.add(foodModel);
+        });
+      }
+
     } else {
       print(response.reasonPhrase);
-    }return data.toString();
-  }
-  // ignore: non_constant_identifier_names
-   FutureBuilder<String> Product() {
-    return FutureBuilder<String>(
-      future: getStore(),
-      builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
-        List<Widget> children;
-        print(snapshot);
-        if (snapshot.hasData) {
-
-          children = <Widget>[
-            Column(
-        children: [
-          GridView.builder(
-            padding: EdgeInsets.all(6),
-            shrinkWrap: true,
-            physics: NeverScrollableScrollPhysics(),
-            itemCount: MyProductViewModel.getMyProduct('${snapshot.data}').length,
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              childAspectRatio: 0.75,
-              crossAxisCount: 2,
-              mainAxisSpacing: 6,
-              crossAxisSpacing: 6,
-            ),
-            itemBuilder: (BuildContext context, int index) {
-              return ProductItemCard(MyProductViewModel.getMyProduct('${snapshot.data}')[index], index);
-            },
-          ),
-          // ignore: dead_code
-          false ? SizedBox(height: 150) : BottomLoader(),
-        ],
-      ),
-      ];
-        } else {
-          // print(snapshot.hasData);
-          children = const <Widget>[
-            
-          ];
-        }
-        return Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: children,
-          ),
-        );
-      },
-    );
+    }
+    // return data.toString();
   }
 
-
+  
   @override
   Widget build(BuildContext context) {
     
@@ -167,8 +125,8 @@ class _MyProductState extends State<MyProduct> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Product(),
-          // _buildProductList(),
+          // Product(),
+          _buildProductList(),
         ],
       ),
     );
@@ -190,7 +148,7 @@ class _MyProductState extends State<MyProduct> {
               crossAxisSpacing: 6,
             ),
             itemBuilder: (BuildContext context, int index) {
-              // return ProductItemCard(MyProductViewModel.getMyProduct()[index], index);
+            return ProductItemCard(foodmodels[index], index);
             },
           ),
           // ignore: dead_code
@@ -200,10 +158,11 @@ class _MyProductState extends State<MyProduct> {
 }
 
 class ProductItemCard extends StatelessWidget {
-  final ProductModel product;
+  // final ProductModel product;
+  final FoodModel food;
   final int index;
 
-  const ProductItemCard(this.product, this.index);
+  const ProductItemCard(this.food, this.index);
 
   @override
   Widget build(BuildContext context) {
@@ -213,19 +172,8 @@ class ProductItemCard extends StatelessWidget {
           onTap: () => Navigator.pushNamed(
             context,
             ProductDetail.routeName,
-            arguments: ProductDetailArguments(product:product),
+            // arguments: ProductDetailArguments(food:food),
           ),
-          // {
-          //   print('${index}');
-          //   print('click');
-          //   Navigator.push(
-          //     context,
-          //     MaterialPageRoute(
-          //       builder: (context) => ProductDetail(),
-          //     ),
-
-          //   );
-          // },
           child: Stack(
             children: [
               Container(
@@ -249,15 +197,12 @@ class ProductItemCard extends StatelessWidget {
   Stack _buildProductImage(double maxHeight) {
     return Stack(
       children: <Widget>[
-        Image.asset(
-          product.image,
-          height: maxHeight - 82,
-          width: double.infinity,
-          fit: BoxFit.cover,
-        ),
-        // if (product.discountPercentage != 0) _buildDiscount(),
-        // if (product.mall) _buildMall(),
-        // if (product.shopRecommended) _buildShopRecommended(),
+        // NetworkImage(
+        //   '${ConfigIp.domain}/${foodModels[index].image_path}',
+        //   // height: maxHeight - 82,
+        //   // width: double.infinity,
+        //   // fit: BoxFit.cover,
+        // ),
       ],
     );
   }
@@ -276,7 +221,7 @@ class ProductItemCard extends StatelessWidget {
       );
 
   Text _buildName() => Text(
-        product.name,
+        food.product_name,
         maxLines: 2,
         overflow: TextOverflow.ellipsis,
       );
@@ -290,7 +235,7 @@ class ProductItemCard extends StatelessWidget {
           ),
           children: <TextSpan>[
             TextSpan(
-              text: '${Format().currency(product.price, decimal: false)}',
+              text: '${Format().currency(food.price, decimal: false)}',
               style: TextStyle(
                 fontSize: 16,
               ),
@@ -300,7 +245,7 @@ class ProductItemCard extends StatelessWidget {
       );
 
   Text _buildSold() => Text(
-        "ขายได้ ${product.sold} ชิ้น",
+        "ขายได้ ${food.quantity} ชิ้น",
         style: TextStyle(
           fontSize: 10,
         ),

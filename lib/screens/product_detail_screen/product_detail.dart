@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:khnomapp/model/product_model.dart';
+import 'package:khnomapp/model/productfood_model.dart';
 import 'package:khnomapp/screens/product_detail_screen/widget_detail/body.dart';
 
 class ProductDetail extends StatelessWidget {
@@ -30,5 +31,5 @@ class ProductDetail extends StatelessWidget {
 class ProductDetailArguments {
   final ProductModel product;
 
-  ProductDetailArguments({@required this.product});
+  ProductDetailArguments({@required this.product, FoodModel food});
 }

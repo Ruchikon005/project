@@ -19,6 +19,7 @@ class SignIn extends StatefulWidget {
 }
 
 class _SignInState extends State<SignIn> {
+  List<UserArgumentModel> userModel = <UserArgumentModel>[];
   TextEditingController _email = TextEditingController();
   TextEditingController _password = TextEditingController();
   static SharedPreferences prefs;
@@ -73,10 +74,10 @@ class _SignInState extends State<SignIn> {
     //get token from pref
     var tokenString = prefs.getString('token');
     print(tokenString);
-
+    // List<UserArgumentModel> user = [];
     //http get profile
     var url = Uri.parse('${ConfigIp.domain}/users/current');
-    var response = await http.get(
+    http.Response response = await http.get(
       url,
       headers: {
         'Content-Type': 'application/json',
@@ -84,13 +85,31 @@ class _SignInState extends State<SignIn> {
         'Authorization': 'Bearer $tokenString',
       },
     );
+    //  List usermodel = (json.decode(response.body))['user'];
+
+    //   for (Map m in usermodel) {
+    //     user.add(UserArgumentModel.formJson(m));
+    //   }
+    // .then((value) {
+    //   // print('value = $value');
+    //   var result = json.decode(value.body);
+    //   prefs.setString('profile', value.body);
+    //   print('result = $result');
+    //   for (var map in result) {
+    //     setState(() {
+    //       userModel = UserArgumentModel.formJson(map);
+    //     });
+    //   }
+    //   // Navigator.pushNamed(context, Nav.routeName);
+    //   // print(result['username']);
+    //   // print(result['user_id']);
+    // });
     var body = convert.jsonDecode(response.body);
 
     if (response.statusCode == 200) {
       print('ok');
       print(response.body);
-      Navigator.pushNamed(context, Nav.routeName,
-          arguments: UserArgumentModel());
+      Navigator.pushNamed(context, Nav.routeName);
       print(body['username']);
       print(body['user_id']);
 
@@ -101,6 +120,16 @@ class _SignInState extends State<SignIn> {
       print('fail');
       print(body['message']);
     }
+    // var responseJson = json.decode(response.body);
+    // print(responseJson);
+
+    // setState(() {
+    //   userModel.add(UserArgumentModel.formJson(responseJson));
+    //   print('...........');
+    //   // print(UserArgumentModel().user_id);
+    //   Navigator.pushNamed(context, Nav.routeName);
+    
+    // });
   }
 
   @override

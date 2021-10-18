@@ -7,6 +7,7 @@ import 'package:khnomapp/config_ip.dart';
 import 'package:khnomapp/model/openstore_model.dart';
 import 'package:khnomapp/screens/store_screen/pages/add_product.dart';
 import 'package:khnomapp/screens/store_screen/pages/my_product_list.dart';
+import 'package:khnomapp/screens/store_screen/pages/my_productnew.dart';
 import 'package:khnomapp/screens/store_screen/pages/order.dart';
 import 'package:khnomapp/utility/my_style.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -23,7 +24,8 @@ class Store extends StatefulWidget {
 int sharedValue = 0;
 
 List<Widget> _widgetOption = <Widget>[
-  MyProduct(),
+  // MyProduct(),
+  Product_to(),
   Order(),
 ];
 
@@ -120,7 +122,7 @@ class _StoreState extends State<Store> {
           onPressed: () {
             var count = 0;
             // ignore: unrelated_type_equality_checks
-            Navigator.popUntil(context, (route) => args == 1 ? count++ == 1 : count++ == 2);
+            Navigator.popUntil(context, (route) => args == 1 ? count++ == 2 : count++ == 1);
             
           },
         ),
@@ -183,6 +185,7 @@ class _StoreState extends State<Store> {
                         style: TextStyle(color: Colors.black, fontSize: 18),
                       ),
                     ),
+
                     1: Container(
                       alignment: Alignment.center,
                       height: 50,

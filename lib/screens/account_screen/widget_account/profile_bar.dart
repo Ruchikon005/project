@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:khnomapp/action/get_userimage.dart';
 import 'package:khnomapp/config_ip.dart';
+import 'package:khnomapp/model/user_argument_model.dart';
 import 'package:khnomapp/screens/account_screen/upload_image.dart';
 import 'package:khnomapp/utility/my_style.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -18,6 +19,7 @@ class ProfileBar extends StatefulWidget {
 }
 
 class _ProfileBarState extends State<ProfileBar> {
+  UserArgumentModel userModel;
   static SharedPreferences prefs;
   static var body;
 

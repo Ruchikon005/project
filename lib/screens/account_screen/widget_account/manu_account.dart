@@ -98,7 +98,7 @@ class _MenuAccountState extends State<MenuAccount> {
            ListTile(
              title: Text('profile'),
              leading: Icon(Icons.list_alt_rounded),
-             onTap: () => Navigator.pushNamed(context, PersonalInfo.routeName),
+             onTap: () => Navigator.pushNamed(context, PersonalInfo.routeName).then(onGoBack),
            ),
            ListTile(
              title: Text('history'),
