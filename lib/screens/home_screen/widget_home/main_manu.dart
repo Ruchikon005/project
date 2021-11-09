@@ -1,6 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:khnomapp/model/main_manu_model.dart';
+import 'package:khnomapp/screens/category_allscreen/page/cate1.dart';
+import 'package:khnomapp/screens/category_allscreen/page/cate2.dart';
+import 'package:khnomapp/screens/category_allscreen/page/cate3.dart';
+import 'package:khnomapp/screens/category_allscreen/page/cate4.dart';
+import 'package:khnomapp/screens/category_allscreen/page/cate5.dart';
+import 'package:khnomapp/screens/category_allscreen/page/cate6.dart';
 import 'package:khnomapp/viewmodels/main_menu_viewmodel.dart';
 
 class MainManu extends StatelessWidget {
@@ -48,7 +54,12 @@ class MainManu extends StatelessWidget {
                           ),
                         ),
                         onPressed: () {
-                          print("click");
+                          index == 0 ? Navigator.pushNamed(context,Cate1.routeName): null;
+                          index == 1 ? Navigator.pushNamed(context,Cate2.routeName): null;
+                          index == 2 ? Navigator.pushNamed(context,Cate3.routeName): null;
+                          index == 3 ? Navigator.pushNamed(context,Cate4.routeName): null;
+                          index == 4 ? Navigator.pushNamed(context,Cate5.routeName): null;
+                          index == 5 ? Navigator.pushNamed(context,Cate6.routeName): null;
                         },
                         child: SvgPicture.asset(
                           menu.icon,

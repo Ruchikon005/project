@@ -25,7 +25,7 @@ int sharedValue = 0;
 
 List<Widget> _widgetOption = <Widget>[
   // MyProduct(),
-  Product_to(),
+  Product_to(true),
   Order(),
 ];
 
@@ -208,7 +208,7 @@ class _StoreState extends State<Store> {
                       // color: sharedValue == 1 ? Colors.blue[100] : Colors.white,
                       padding: EdgeInsets.all(8),
                       child: Text(
-                        'Oder',
+                        'Order',
                         style: TextStyle(color: Colors.black, fontSize: 18),
                       ),
                     )

@@ -2,25 +2,25 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:khnomapp/config_ip.dart';
-import 'package:khnomapp/model/productfood_model.dart';
+import 'package:khnomapp/model/myproduct_model.dart';
 import 'package:khnomapp/model/user_image_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert' as convert;
 import 'package:http/http.dart' as http;
 
-class Product_to extends StatefulWidget {
+class AllProduct extends StatefulWidget {
   
-  const Product_to(bool Bool, {Key key}) : super(key: key);
+  const AllProduct({Key key}) : super(key: key);
   @override
-  _Product_toState createState() => _Product_toState();
+  _AllProductState createState() => _AllProductState();
 }
 
-class _Product_toState extends State<Product_to> {
+class _AllProductState extends State<AllProduct> {
   // bool check = Bool;
   static SharedPreferences prefs;
   Map<String, dynamic> profile = User.profile;
   int indexWidget = 0;
-  List<FoodModel> foodModel = [];
+  List<Myproduct> foodModel = [];
 
   @override
   void initState() {
@@ -50,12 +50,12 @@ class _Product_toState extends State<Product_to> {
 
   // ignore: missing_return
   Future<Null> readApiProduct() async {
-    var url = Uri.parse('${ConfigIp.domain}/products/productlist_store/6');
+    var url = Uri.parse('${ConfigIp.domain}/products/productlist');
     final response = await http.get(url);
     print(response.body);
     var res = convert.jsonDecode(response.body);
     for (var item in res) {
-      FoodModel food = FoodModel.fromJson(item);
+      Myproduct food = Myproduct.fromJson(item);
       print('name ---> ${food.price}');
       setState(() {
         foodModel.add(food);

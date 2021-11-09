@@ -104,9 +104,9 @@ class _MyProductState extends State<MyProduct> {
       print(data);
 
       for(var map in data){
-        FoodModel foodModel = FoodModel.fromJson(map);
+        // FoodModel foodModel = FoodModel.fromj(map);
         setState(() {
-          foodmodels.add(foodModel);
+          // foodmodels.add(foodModel);
         });
       }
 
@@ -234,12 +234,12 @@ class ProductItemCard extends StatelessWidget {
             fontSize: 12,
           ),
           children: <TextSpan>[
-            TextSpan(
-              text: '${Format().currency(food.price, decimal: false)}',
-              style: TextStyle(
-                fontSize: 16,
-              ),
-            ),
+            // TextSpan(
+            //   text: '${Format().currency(food.price, decimal: false)}',
+            //   style: TextStyle(
+            //     fontSize: 16,
+            //   ),
+            // ),
           ],
         ),
       );

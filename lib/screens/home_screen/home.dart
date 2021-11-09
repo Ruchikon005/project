@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:khnomapp/screens/home_screen/widget_home/all_product.dart';
 import 'package:khnomapp/screens/home_screen/widget_home/banner_slider.dart';
 import 'package:khnomapp/screens/home_screen/widget_home/main_manu.dart';
 import 'package:khnomapp/screens/home_screen/widget_home/product_list.dart';
@@ -31,7 +32,7 @@ class _HomeState extends State<Home> {
               children: [
                 BannerSlider(),
                 MainManu(),
-                ProductLoadMore(),
+                AllProduct(),
               ],
             ),
           ),
