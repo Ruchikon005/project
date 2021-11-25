@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:khnomapp/screens/cart_screeen/cart.dart';
 
 class Header extends StatefulWidget {
   final TrackingScrollController scrollController;
@@ -47,7 +48,10 @@ class _HeaderState extends State<Header> {
                     _buildSearch(),
                     SizedBox(width: 8),
                     _buildIconButton(
-                      onPressed: () => print("click"),
+                      onPressed: () {
+                        print("click");
+                        Navigator.pushNamed(context, CartScreen.routeName);
+                      },
                       icon: Icons.shopping_cart,
                       notification: 20,
                     ),

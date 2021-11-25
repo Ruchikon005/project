@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:khnomapp/config_ip.dart';
 import 'package:khnomapp/model/myproduct_model.dart';
 import 'package:khnomapp/model/user_image_model.dart';
+import 'package:khnomapp/screens/product_detail_screen/product_detail.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert' as convert;
 import 'package:http/http.dart' as http;
@@ -85,99 +86,95 @@ class _AllProductState extends State<AllProduct> {
         crossAxisSpacing: 6,
       ),
       itemBuilder: (BuildContext context, index) {
-        return Stack(
-          children: [
-            Container(
-              color: Colors.white,
-              height: 300,
-            ),
-            Column(
-              children: [
-                Container(
-                  height: 160,
-                  decoration: BoxDecoration(
-                    image: DecorationImage(
-                        image: NetworkImage(
-                            '${ConfigIp.domain}/${foodModel[index].image_path}',
-                            scale: heightScreen - 82),
-                        fit: BoxFit.cover),
+        return GestureDetector(
+          onTap: () => Navigator.pushNamed(
+            context,
+            ProductDetail.routeName,
+            arguments: foodModel[index],
+          ),
+          child: Stack(
+            children: [
+              Container(
+                color: Colors.white,
+                // height: 300,
+              ),
+              Column(
+                children: [
+                  Container(
+                    height: 160,
+                    decoration: BoxDecoration(
+                      image: DecorationImage(
+                          image: NetworkImage(
+                              '${ConfigIp.domain}/${foodModel[index].image_path}',
+                              scale: heightScreen - 82),
+                          fit: BoxFit.cover),
+                    ),
                   ),
-                ),
-                Padding(
-                  padding: EdgeInsets.all(8),
-                  child: Column(
+                  Padding(
+                    padding: EdgeInsets.all(8),
+                    child: Column(
+                      children: [
+                        Container(
+                          alignment: Alignment.bottomLeft,
+                          child: Text(
+                            foodModel[index].product_name,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        SizedBox(height: 12),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              Positioned(
+                bottom: 0,
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
                     children: [
-                      Container(
-                        alignment: Alignment.bottomLeft,
-                        child: Text(
-                          foodModel[index].product_name,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
+                      RichText(
+                        text: TextSpan(
+                          text: '\$ ',
+                          style: TextStyle(
+                            color: Colors.deepOrange,
+                            fontSize: 12,
+                          ),
+                          children: <TextSpan>[
+                            TextSpan(
+                              text: '${foodModel[index].price}',
+                              style: TextStyle(
+                                fontSize: 16,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                      SizedBox(height: 12),
                     ],
                   ),
                 ),
-              ],
-            ),
-            Positioned(
-              bottom: 0,
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  children: [
-                    // Text('\$ ',
-                    //     style: TextStyle(
-                    //       color: Colors.deepOrange,
-                    //       fontSize: 12,
-                    //     )),
-                    // Text(
-                    //   '${foodModel[index].price}',
-                    //   style: TextStyle(
-                    //     fontSize: 16,
-                    //   ),
-                    // ),
-                    RichText(
-                      text: TextSpan(
-                        text: '\$ ',
+              ),
+              Positioned(
+                bottom: 0,
+                right: 0,
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    children: [
+                      Text(
+                        "จำนวน ${foodModel[index].quantity} ชิ้น",
                         style: TextStyle(
-                          color: Colors.deepOrange,
-                          fontSize: 12,
+                          fontSize: 10,
                         ),
-                        children: <TextSpan>[
-                          TextSpan(
-                            text: '${foodModel[index].price}',
-                            style: TextStyle(
-                              fontSize: 16,
-                            ),
-                          ),
-                        ],
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-            ),
-            Positioned(
-              bottom: 0,
-              right: 0,
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  children: [
-                    Text(
-                      "จำนวน ${foodModel[index].quantity} ชิ้น",
-                      style: TextStyle(
-                        fontSize: 10,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            )
-            // Text(foodModel[index].)
-          ],
+              )
+              // Text(foodModel[index].)
+            ],
+          ),
         );
       },
     );

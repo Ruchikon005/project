@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:khnomapp/model/myproduct_model.dart';
 import 'package:khnomapp/model/product_model.dart';
 import 'package:khnomapp/model/productfood_model.dart';
 import 'package:khnomapp/screens/product_detail_screen/widget_detail/body.dart';
@@ -8,16 +9,18 @@ class ProductDetail extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ProductDetailArguments arguments = ModalRoute.of(context).settings.arguments;
+    final product = ModalRoute.of(context).settings.arguments as Myproduct;
     return Scaffold(
+      // appBar: AppBar(title:Text(product.product_name))
       appBar: CustomAppBar(context),
-      body: Body(product: arguments.product,),
+      
+      body: Body(product: product,),
     );
   }
 
-
   AppBar CustomAppBar(BuildContext context) {
     return AppBar(
+      // title: Text(),
       backgroundColor: Colors.white,
       leading: IconButton(
         onPressed: () => Navigator.pop(context),
@@ -28,8 +31,3 @@ class ProductDetail extends StatelessWidget {
   }
 }
 
-class ProductDetailArguments {
-  final ProductModel product;
-
-  ProductDetailArguments({@required this.product, FoodModel food});
-}

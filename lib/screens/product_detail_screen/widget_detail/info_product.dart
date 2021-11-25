@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:khnomapp/model/myproduct_model.dart';
 import 'package:khnomapp/model/product_model.dart';
 
 class InfoProduct extends StatelessWidget {
   const InfoProduct({
     Key key,
-    @required this.product,
+    this.product,
+    // this.product,
   }) : super(key: key);
-
-  final ProductModel product;
+  final Myproduct product;
 
   @override
   Widget build(BuildContext context) {
@@ -16,12 +17,17 @@ class InfoProduct extends StatelessWidget {
       width: double.infinity,
       height: 200,
       decoration: BoxDecoration(
-          color: Colors.grey.shade100, borderRadius: BorderRadius.circular(10)),
+        color: Colors.white,
+        borderRadius: BorderRadius.only(
+          bottomLeft: Radius.circular(10),
+          bottomRight: Radius.circular(10),
+        ),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            '${product.name}',
+            '${product.product_name}',
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
@@ -34,6 +40,22 @@ class InfoProduct extends StatelessWidget {
                 color: Colors.deepOrange,
                 fontSize: 20,
                 fontWeight: FontWeight.bold),
+          ),
+          SizedBox(height: 20),
+          Text(
+            'รายละเอียด',
+            style: TextStyle(
+              color: Colors.black87,
+              fontSize: 15,
+            ),
+          ),
+          SizedBox(height: 10),
+          Text(
+            '${product.product_detail}',
+            style: TextStyle(
+              color: Colors.black87,
+              fontSize: 15,
+            ),
           ),
         ],
       ),

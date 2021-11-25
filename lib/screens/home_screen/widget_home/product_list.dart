@@ -56,7 +56,7 @@ class ProductItemCard extends StatelessWidget {
           onTap: () => Navigator.pushNamed(
             context,
             ProductDetail.routeName,
-            arguments: ProductDetailArguments(product:product),
+            // arguments: ProductDetailArguments(product:product),
           ),
           // {
           //   print('${index}');

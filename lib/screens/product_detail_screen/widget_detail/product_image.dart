@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:khnomapp/model/product_model.dart';
+import 'package:khnomapp/config_ip.dart';
+import 'package:khnomapp/model/myproduct_model.dart';
+
+import 'package:khnomapp/screens/store_screen/pages/my_product_list.dart';
 
 class ProductImage extends StatelessWidget {
+  
   const ProductImage({
-    Key key,
-    @required this.product,
+    Key key, this.product,
+    // this.product,
   }) : super(key: key);
-
-  final ProductModel product;
+  final Myproduct product;
 
   @override
   Widget build(BuildContext context) {
@@ -16,9 +19,9 @@ class ProductImage extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           color: Colors.greenAccent,
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.only(topLeft: Radius.circular(10),topRight: Radius.circular(10)),
           image: DecorationImage(
-            image: ExactAssetImage(product.image),
+            image: NetworkImage('${ConfigIp.domain}/${product.image_path}'),
             fit: BoxFit.cover,
           ),
         ),

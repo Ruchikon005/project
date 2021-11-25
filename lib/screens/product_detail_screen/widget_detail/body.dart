@@ -1,19 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:khnomapp/model/product_model.dart';
+import 'package:khnomapp/model/myproduct_model.dart';
+import 'package:khnomapp/screens/product_detail_screen/widget_detail/box_shop.dart';
+// import 'package:khnomapp/model/product_model.dart';
 import 'package:khnomapp/screens/product_detail_screen/widget_detail/info_product.dart';
 import 'package:khnomapp/screens/product_detail_screen/widget_detail/product_image.dart';
+import 'package:khnomapp/screens/store_screen/pages/my_product_list.dart';
 
 class Body extends StatelessWidget {
-  final ProductModel product;
 
   const Body({
-    Key key,
-    this.product,
+    Key key, this.product,
+    // this.product,
   }) : super(key: key);
+  final Myproduct product;
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
+    return Container(
+      color: Colors.grey.shade300,
       padding: const EdgeInsets.all(8.0),
       child: Stack(
         children: [
@@ -21,8 +25,10 @@ class Body extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               ProductImage(product: product),
-              SizedBox(height: 20),
               InfoProduct(product: product),
+              SizedBox(height: 10),
+              BoxShop(product: product),
+              
               // Text('data')
             ],
           ),

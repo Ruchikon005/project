@@ -1,14 +1,18 @@
 // import 'package:contained_tab_bar_view/contained_tab_bar_view.dart';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert' as convert;
 import 'package:http/http.dart' as http;
 import 'package:khnomapp/config_ip.dart';
 import 'package:khnomapp/model/openstore_model.dart';
+import 'package:khnomapp/routes.dart';
+import 'package:khnomapp/screens/store_screen/pages/add_locations.dart';
 import 'package:khnomapp/screens/store_screen/pages/add_product.dart';
 import 'package:khnomapp/screens/store_screen/pages/my_product_list.dart';
 import 'package:khnomapp/screens/store_screen/pages/my_productnew.dart';
 import 'package:khnomapp/screens/store_screen/pages/order.dart';
+import 'package:khnomapp/screens/store_screen/pages/screens/google_place.dart';
 import 'package:khnomapp/utility/my_style.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -83,7 +87,7 @@ class _StoreState extends State<Store> {
     setState(() {});
   }
 
-   // ignore: missing_return
+  // ignore: missing_return
   Future<String> getStoreDetail(String uid) async {
     var url = Uri.parse('${ConfigIp.domain}/stores/ownerfindstore/$uid');
     var response = await http.get(url);
@@ -122,8 +126,8 @@ class _StoreState extends State<Store> {
           onPressed: () {
             var count = 0;
             // ignore: unrelated_type_equality_checks
-            Navigator.popUntil(context, (route) => args == 1 ? count++ == 2 : count++ == 1);
-            
+            Navigator.popUntil(
+                context, (route) => args == 1 ? count++ == 2 : count++ == 1);
           },
         ),
         actions: [],
@@ -145,9 +149,21 @@ class _StoreState extends State<Store> {
                 child: Stack(children: [
                   Column(children: [
                     SizedBox(height: 40),
-                    _profileImage(),
-                    SizedBox(height: 20),
-                    _manageStore(),
+                    Padding(
+                      padding: EdgeInsets.all(16),
+                      child: Row(
+                        children: [
+                          _profileImage(),
+                          SizedBox(
+                            width: 10,
+                          ),
+                          Column(children: [
+                            _manageStore(),
+                            addlocationbutton(),
+                          ]),
+                        ],
+                      ),
+                    ),
                   ]),
                 ]),
               ),
@@ -185,7 +201,6 @@ class _StoreState extends State<Store> {
                         style: TextStyle(color: Colors.black, fontSize: 18),
                       ),
                     ),
-
                     1: Container(
                       alignment: Alignment.center,
                       height: 50,
@@ -232,7 +247,8 @@ class _StoreState extends State<Store> {
             child: sharedValue == 0
                 ? InkWell(
                     onTap: () {
-                      Navigator.pushNamed(context, AddProduct.routeName).then(onGoBack);
+                      Navigator.pushNamed(context, AddProduct.routeName)
+                          .then(onGoBack);
                     },
                     child: Container(
                       alignment: Alignment.center,
@@ -296,12 +312,12 @@ class _StoreState extends State<Store> {
           print(snapshot);
           children = <Widget>[
             Container(
-                      alignment: Alignment.center,
-                      child: Text(
-                        snapshot.data,
-                        style: TextStyle(fontSize: 20),
-                      ),
-                    ),
+              alignment: Alignment.center,
+              child: Text(
+                snapshot.data,
+                style: TextStyle(fontSize: 20),
+              ),
+            ),
           ];
         } else {
           print('manage2');
@@ -309,12 +325,12 @@ class _StoreState extends State<Store> {
 
           children = <Widget>[
             Container(
-                      alignment: Alignment.center,
-                      child: Text(
-                        'Store name',
-                        style: TextStyle(fontSize: 20),
-                      ),
-                    ),
+              alignment: Alignment.center,
+              child: Text(
+                'Store name',
+                style: TextStyle(fontSize: 20),
+              ),
+            ),
           ];
         }
         return Center(
@@ -325,6 +341,18 @@ class _StoreState extends State<Store> {
           ),
         );
       },
+    );
+  }
+
+  Widget addlocationbutton() {
+    return Container(
+      // ignore: missing_required_param
+      child: ElevatedButton(
+        child: Text('Add location'),
+        onPressed: () {
+          Navigator.pushNamed(context, GooglePlace.routeName);
+        },
+      ),
     );
   }
 }
