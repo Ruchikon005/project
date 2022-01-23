@@ -350,7 +350,7 @@ class _StoreState extends State<Store> {
       child: ElevatedButton(
         child: Text('Add location'),
         onPressed: () {
-          Navigator.pushNamed(context, GooglePlace.routeName);
+          Navigator.pushNamed(context, AddLocation.routeName);
         },
       ),
     );

@@ -1,192 +1,180 @@
 import 'dart:math';
-import 'package:flutter/material.dart';
-import 'package:flutter_google_places/flutter_google_places.dart';
-import 'package:google_api_headers/google_api_headers.dart';
-import 'package:google_maps_webservice/places.dart';
 
-const kGoogleApiKey = "AIzaSyA_Qjr7_6nUYGJ7IZQiQ-M4Sr6qc8PrQJ0";
+import 'package:flutter/material.dart';
 
 class AddLocation extends StatefulWidget {
-  static var routeName = './add_locations';
-
-  const AddLocation({Key key}) : super(key: key);
+  static var routeName = '/add_location';
+  AddLocation({Key key}) : super(key: key);
 
   @override
-  _AddLocationState createState() => _AddLocationState();
+  _AddlocationState createState() => _AddlocationState();
 }
 
-final homeScaffoldKey = GlobalKey<ScaffoldState>();
-final searchScaffoldKey = GlobalKey<ScaffoldState>();
+class _AddlocationState extends State<AddLocation> {
+  TextEditingController _category = TextEditingController();
 
-class _AddLocationState extends State<AddLocation> {
-  Mode _mode = Mode.overlay;
+  List<String> options = <String>[
+    'กระบี่',
+    'กรุงเทพมหานคร',
+    'กาญจนบุรี',
+    'กาฬสินธุ์',
+    'กำแพงเพชร',
+    'ขอนแก่น',
+    'จันทบุรี',
+    'ฉะเชิงเทรา',
+    'ชลบุรี',
+    'ชัยนาท',
+    'ชัยภูมิ',
+    'ชุมพร',
+    'เชียงราย',
+    'เชียงใหม่',
+    'ตรัง',
+    'ตราด',
+    'ตาก',
+    'นครนายก',
+    'นครปฐม',
+    'นครพนม',
+    'นครราชสีมา',
+    'นครศรีธรรมราช',
+    'นครสวรรค์',
+    'นนทบุรี',
+    'นราธิวาส',
+    'น่าน',
+    'บึงกาฬ',
+    'บุรีรัมย์',
+    'ปทุมธานี',
+    'ประจวบคีรีขันธ์',
+    'ปราจีนบุรี',
+    'ปัตตานี',
+    'พะเยา',
+    'พระนครศรีอยุธยา',
+    'พังงา',
+    'พัทลุง',
+    'พิจิตร',
+    'พิษณุโลก',
+    'เพชรบุรี',
+    'เพชรบูรณ์',
+    'แพร่',
+    'ภูเก็ต',
+    'มหาสารคาม',
+    'มุกดาหาร',
+    'แม่ฮ่องสอน',
+    'ยโสธร',
+    'ยะลา',
+    'ร้อยเอ็ด',
+    'ระนอง',
+    'ระยอง',
+    'ราชบุรี',
+    'ลพบุรี',
+    'ลำปาง',
+    'ลำพูน',
+    'เลย	',
+    'ศรีสะเกษ',
+    'สกลนคร',
+    'สงขลา',
+    'สตูล',
+    'สมุทรปราการ',
+    'สมุทรสงคราม',
+    'สมุทรสาคร',
+    'สระแก้ว',
+    'สระบุรี',
+    'สิงห์บุรี',
+    'สุโขทัย',
+    'สุพรรณบุรี',
+    'สุราษฎร์ธานี',
+    'สุรินทร์',
+    'หนองคาย',
+    'หนองบัวลำภู',
+    'อ่างทอง',
+    'อำนาจเจริญ',
+    'อุดรธานี',
+    'อุตรดิตถ์',
+    'อุทัยธานี',
+    'อุบลราชธานี',
+  ];
+  String dropdownValue;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Add Location'),
+        title: Text('ตั้งค่าการจัดส่ง'),
       ),
-      body: Center(
-          child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          _buildDropdownMenu(),
-          ElevatedButton(
-            onPressed: _handlePressButton,
-            child: Text("Search places"),
-          ),
-          ElevatedButton(
-            child: Text("Custom"),
-            onPressed: () {
-              Navigator.of(context).pushNamed("/search");
-            },
+      body: Column(
+        children: [
+          Container(
+            padding: EdgeInsets.all(8),
+            height: 150,
+            width: double.infinity,
+            color: Colors.grey,
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      child: Text('เลือกจังหวัด'),
+                    ),
+                    Container(
+                      // alignment: Alignment.centerRight,
+                      child: DropdownButton<String>(
+                        value: dropdownValue,
+                        onChanged: (String newValue) {
+                          setState(() {
+                            dropdownValue = newValue;
+                            _category.text = dropdownValue;
+                            print(_category.text);
+                          });
+                        },
+                        underline: Container(),
+                        hint: Container(
+                            alignment: Alignment.centerRight,
+                            width: 180,
+                            child: Text("จังหวัด",
+                                style: TextStyle(fontSize: 15),
+                                textAlign: TextAlign.end)),
+                        selectedItemBuilder: (BuildContext context) {
+                          return options.map<Widget>((String item) {
+                            return Container(
+                                alignment: Alignment.centerRight,
+                                width: 180,
+                                child:
+                                    Text(item, style: TextStyle(fontSize: 15)));
+                          }).toList();
+                        },
+                        items: options
+                            .map<DropdownMenuItem<String>>((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(value, style: TextStyle(fontSize: 15)),
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                Container(
+                  child: Column(
+                    children: [
+                      Text("เพิ่มสถานที่นัดรับ"),
+                      Row(
+                        children: [
+                          Text('1.'),
+                          TextFormField(
+                            decoration: InputDecoration(),
+                          )
+                        ],
+                      )
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
-      )),
-    );
-  }
-
-  Widget _buildDropdownMenu() => DropdownButton(
-        value: _mode,
-        items: <DropdownMenuItem<Mode>>[
-          DropdownMenuItem<Mode>(
-            child: Text("Overlay"),
-            value: Mode.overlay,
-          ),
-          DropdownMenuItem<Mode>(
-            child: Text("Fullscreen"),
-            value: Mode.fullscreen,
-          ),
-        ],
-        onChanged: (m) {
-          setState(() {
-            _mode = m;
-          });
-        },
-      );
-
-  void onError(PlacesAutocompleteResponse response) {
-    homeScaffoldKey.currentState.showSnackBar(
-      SnackBar(content: Text(response.errorMessage)),
-    );
-  }
-
-  Future<void> _handlePressButton() async {
-    // show input autocomplete with selected mode
-    // then get the Prediction selected
-    Prediction p = await PlacesAutocomplete.show(
-      context: context,
-      apiKey: kGoogleApiKey,
-      onError: onError,
-      mode: _mode,
-      language: "fr",
-      decoration: InputDecoration(
-        hintText: 'Search',
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(20),
-          borderSide: BorderSide(
-            color: Colors.white,
-          ),
-        ),
-      ),
-      components: [Component(Component.country, "fr")],
-    );
-
-    displayPrediction(p, homeScaffoldKey.currentState);
-  }
-}
-
-Future<Null> displayPrediction(Prediction p, ScaffoldState scaffold) async {
-  if (p != null) {
-    // get detail (lat/lng)
-    GoogleMapsPlaces _places = GoogleMapsPlaces(
-      apiKey: kGoogleApiKey,
-      apiHeaders: await GoogleApiHeaders().getHeaders(),
-    );
-    PlacesDetailsResponse detail = await _places.getDetailsByPlaceId(p.placeId);
-    final lat = detail.result.geometry.location.lat;
-    final lng = detail.result.geometry.location.lng;
-
-    // ignore: deprecated_member_use
-    scaffold.showSnackBar(
-      SnackBar(content: Text("${p.description} - $lat/$lng")),
-    );
-  }
-}
-
-// custom scaffold that handle search
-// basically your widget need to extends [GooglePlacesAutocompleteWidget]
-// and your state [GooglePlacesAutocompleteState]
-class CustomSearchScaffold extends PlacesAutocompleteWidget {
-  CustomSearchScaffold()
-      : super(
-          apiKey: kGoogleApiKey,
-          sessionToken: Uuid().generateV4(),
-          language: "en",
-          components: [Component(Component.country, "uk")],
-        );
-
-  @override
-  _CustomSearchScaffoldState createState() => _CustomSearchScaffoldState();
-}
-
-class _CustomSearchScaffoldState extends PlacesAutocompleteState {
-  @override
-  Widget build(BuildContext context) {
-    final appBar = AppBar(title: AppBarPlacesAutoCompleteTextField());
-    final body = PlacesAutocompleteResult(
-      onTap: (p) {
-        displayPrediction(p, searchScaffoldKey.currentState);
-      },
-      logo: Row(
-        children: [FlutterLogo()],
-        mainAxisAlignment: MainAxisAlignment.center,
       ),
     );
-    return Scaffold(key: searchScaffoldKey, appBar: appBar, body: body);
   }
-
-  @override
-  void onResponseError(PlacesAutocompleteResponse response) {
-    super.onResponseError(response);
-    // ignore: deprecated_member_use
-    searchScaffoldKey.currentState.showSnackBar(
-      SnackBar(content: Text(response.errorMessage)),
-    );
-  }
-
-  @override
-  void onResponse(PlacesAutocompleteResponse response) {
-    super.onResponse(response);
-    if (response != null && response.predictions.isNotEmpty) {
-      // ignore: deprecated_member_use
-      searchScaffoldKey.currentState.showSnackBar(
-        SnackBar(content: Text("Got answer")),
-      );
-    }
-  }
-}
-
-class Uuid {
-  final Random _random = Random();
-
-  String generateV4() {
-    // Generate xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx / 8-4-4-4-12.
-    final int special = 8 + _random.nextInt(4);
-
-    return '${_bitsDigits(16, 4)}${_bitsDigits(16, 4)}-'
-        '${_bitsDigits(16, 4)}-'
-        '4${_bitsDigits(12, 3)}-'
-        '${_printDigits(special, 1)}${_bitsDigits(12, 3)}-'
-        '${_bitsDigits(16, 4)}${_bitsDigits(16, 4)}${_bitsDigits(16, 4)}';
-  }
-
-  String _bitsDigits(int bitCount, int digitCount) =>
-      _printDigits(_generateBits(bitCount), digitCount);
-
-  int _generateBits(int bitCount) => _random.nextInt(1 << bitCount);
-
-  String _printDigits(int value, int count) =>
-      value.toRadixString(16).padLeft(count, '0');
 }
