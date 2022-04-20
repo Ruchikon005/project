@@ -7,12 +7,12 @@ import 'package:http/http.dart' as http;
 import 'package:khnomapp/config_ip.dart';
 import 'package:khnomapp/model/openstore_model.dart';
 import 'package:khnomapp/routes.dart';
+import 'package:khnomapp/screens/store_screen/pages/add_locationMarker.dart';
 import 'package:khnomapp/screens/store_screen/pages/add_locations.dart';
 import 'package:khnomapp/screens/store_screen/pages/add_product.dart';
 import 'package:khnomapp/screens/store_screen/pages/my_product_list.dart';
 import 'package:khnomapp/screens/store_screen/pages/my_productnew.dart';
 import 'package:khnomapp/screens/store_screen/pages/order.dart';
-import 'package:khnomapp/screens/store_screen/pages/screens/google_place.dart';
 import 'package:khnomapp/utility/my_style.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -25,17 +25,10 @@ class Store extends StatefulWidget {
   _StoreState createState() => _StoreState();
 }
 
-int sharedValue = 0;
-
-List<Widget> _widgetOption = <Widget>[
-  // MyProduct(),
-  Product_to(true),
-  Order(),
-];
-
 class _StoreState extends State<Store> {
   static SharedPreferences prefs;
   static var body;
+  static Map stName;
 
   Map<String, dynamic> profile = {
     'user_id': '',
@@ -49,6 +42,14 @@ class _StoreState extends State<Store> {
     super.initState();
     _getProfile();
   }
+
+  int sharedValue = 0;
+
+  List<Widget> _widgetOption = <Widget>[
+    // MyProduct(),
+    Product_to(true),
+    Order(),
+  ];
 
   void _getProfile() async {
     prefs = await SharedPreferences.getInstance();
@@ -88,24 +89,22 @@ class _StoreState extends State<Store> {
   }
 
   // ignore: missing_return
-  Future<String> getStoreDetail(String uid) async {
+  Future<Map> getStoreDetail(String uid) async {
     var url = Uri.parse('${ConfigIp.domain}/stores/ownerfindstore/$uid');
     var response = await http.get(url);
     body = convert.jsonDecode(response.body);
     // await prefs.setString('ImageDetail', response.body);
     if (response.statusCode == 200) {
       print(body);
-      print(body['store_name']);
-      String stid = body['store_name'];
-      print(stid);
-      return stid;
+      stName = body;
+      return stName;
     } else {
       print(response.body);
     }
   }
 
-  Future<String> getStore() async {
-    String data = await getStoreDetail('${profile['user_id']}');
+  Future<Map> getStore() async {
+    var data = await getStoreDetail('${profile['user_id']}');
     return data;
   }
 
@@ -137,7 +136,7 @@ class _StoreState extends State<Store> {
           style: TextStyle(color: Colors.black),
         ),
       ),
-      backgroundColor: Colors.blueGrey,
+      backgroundColor: Colors.grey.shade100,
       body: Stack(
         children: [
           SingleChildScrollView(
@@ -303,10 +302,10 @@ class _StoreState extends State<Store> {
     );
   }
 
-  FutureBuilder<String> _manageStore() {
-    return FutureBuilder<String>(
+  FutureBuilder<Map> _manageStore() {
+    return FutureBuilder<Map>(
       future: getStore(),
-      builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+      builder: (BuildContext context, AsyncSnapshot<Map> snapshot) {
         List<Widget> children;
         if (snapshot.hasData) {
           print(snapshot);
@@ -314,7 +313,7 @@ class _StoreState extends State<Store> {
             Container(
               alignment: Alignment.center,
               child: Text(
-                snapshot.data,
+                snapshot.data['store_name'],
                 style: TextStyle(fontSize: 20),
               ),
             ),
@@ -348,11 +347,19 @@ class _StoreState extends State<Store> {
     return Container(
       // ignore: missing_required_param
       child: ElevatedButton(
-        child: Text('Add location'),
+        child: Text('เพิ่มสถานที่นัดรับ'),
         onPressed: () {
-          Navigator.pushNamed(context, AddLocation.routeName);
+          print(stName['store_id']);
+          Navigator.pushNamed(context, add_locationMarker.routeName,
+              arguments: stName['store_id']);
         },
       ),
     );
   }
 }
+
+// class ScreenArguments {
+//   final stName;
+
+//   ScreenArguments(this.stName);
+// }

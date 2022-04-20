@@ -39,7 +39,6 @@ class _MyProductState extends State<MyProduct> {
   void initState() {
     super.initState();
     _getProfile();
-    
     onGoBack(dynamic);
   }
 

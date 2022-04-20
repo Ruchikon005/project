@@ -1,7 +1,7 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:convert' as convert;
 import 'package:flutter/material.dart';
-import 'package:khnomapp/action/get_userimage.dart';
 import 'package:khnomapp/config_ip.dart';
 import 'package:khnomapp/model/user_argument_model.dart';
 import 'package:khnomapp/nav/nav.dart';
@@ -26,12 +26,15 @@ class _SignInState extends State<SignIn> {
 
   _initPref() async {
     prefs = await SharedPreferences.getInstance();
+    if (prefs.getString('token') != null) {
+      Navigator.pushReplacementNamed(context, Nav.routeName);
+    }
   }
 
   @override
   void initState() {
-    super.initState();
     _initPref();
+    super.initState();
   }
 
   final success = SnackBar(content: Text('Login succeded!'));
@@ -39,14 +42,15 @@ class _SignInState extends State<SignIn> {
   final _formKey = GlobalKey<FormState>();
 
   Future login() async {
+    print("OK");
     var url = "${ConfigIp.domain}/users/authenticate";
+    
     http.Response response = await http.post(Uri.parse(url), body: {
       "email": _email.text,
       "password": _password.text,
     });
-
     var jsonResponse;
-
+    print(response);
     if (response.statusCode == 200) {
       jsonResponse = json.decode(response.body);
       print("Response status: ${response.statusCode}");
@@ -55,27 +59,19 @@ class _SignInState extends State<SignIn> {
       if (jsonResponse != null) {
         prefs.setString("token", jsonResponse['token']);
         print(prefs.getString('token'));
-        _getProfile();
+        await _getProfile();
+        return true;
       }
     } else {
       setState(() {});
-
       print("Response status: ${response.body}");
-    }
-
-    if (jsonResponse['token'] != null) {
-      ScaffoldMessenger.of(context).showSnackBar(success);
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(error);
+      return false;
     }
   }
 
   Future<void> _getProfile() async {
     //get token from pref
     var tokenString = prefs.getString('token');
-    print(tokenString);
-    // List<UserArgumentModel> user = [];
-    //http get profile
     var url = Uri.parse('${ConfigIp.domain}/users/current');
     http.Response response = await http.get(
       url,
@@ -85,51 +81,13 @@ class _SignInState extends State<SignIn> {
         'Authorization': 'Bearer $tokenString',
       },
     );
-    //  List usermodel = (json.decode(response.body))['user'];
-
-    //   for (Map m in usermodel) {
-    //     user.add(UserArgumentModel.formJson(m));
-    //   }
-    // .then((value) {
-    //   // print('value = $value');
-    //   var result = json.decode(value.body);
-    //   prefs.setString('profile', value.body);
-    //   print('result = $result');
-    //   for (var map in result) {
-    //     setState(() {
-    //       userModel = UserArgumentModel.formJson(map);
-    //     });
-    //   }
-    //   // Navigator.pushNamed(context, Nav.routeName);
-    //   // print(result['username']);
-    //   // print(result['user_id']);
-    // });
     var body = convert.jsonDecode(response.body);
-
     if (response.statusCode == 200) {
-      print('ok');
-      print(response.body);
-      Navigator.pushNamed(context, Nav.routeName);
-      print(body['username']);
-      print(body['user_id']);
-
       //save profile to pref
       await prefs.setString('profile', response.body);
-
     } else {
-      print('fail');
       print(body['message']);
     }
-    // var responseJson = json.decode(response.body);
-    // print(responseJson);
-
-    // setState(() {
-    //   userModel.add(UserArgumentModel.formJson(responseJson));
-    //   print('...........');
-    //   // print(UserArgumentModel().user_id);
-    //   Navigator.pushNamed(context, Nav.routeName);
-    
-    // });
   }
 
   @override
@@ -207,10 +165,61 @@ class _SignInState extends State<SignIn> {
 
   Widget loginButton() => Container(
         child: ElevatedButton(
-          onPressed: () {
-            setState(() {});
-
-            login();
+          onPressed: () async {
+            print(_email.text);
+            print(_password.text);
+            bool check = await login();
+            _password.text.isEmpty || _email.text.isEmpty
+                ? await showDialog(
+                    context: context,
+                    builder: (BuildContext builderContext) {
+                      Timer(Duration(seconds: 2), () {
+                        Navigator.of(context).pop();
+                      });
+                      return AlertDialog(
+                        title: Container(
+                          alignment: Alignment.center,
+                          height: 80,
+                          child: Text(
+                            'Please enter your\nEmail and Password',
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                        backgroundColor: Colors.white,
+                      );
+                    })
+                // :setState(() {});
+                : await showDialog(
+                    context: context,
+                    builder: (BuildContext builderContext) {
+                      Timer(Duration(seconds: 2), () {
+                        Navigator.of(context).pop();
+                      });
+                      return AlertDialog(
+                          title: Container(
+                            height: 100,
+                            alignment: Alignment.center,
+                            child: check == true
+                                ? Text(
+                                    'Login Sucsess',
+                                    style: TextStyle(
+                                        color: Colors.white, fontSize: 30),
+                                  )
+                                : Text(
+                                    'Wrong\nEmail or Password',
+                                    style: TextStyle(color: Colors.white),
+                                    textAlign: TextAlign.center,
+                                  ),
+                          ),
+                          backgroundColor:
+                              check == true ? Colors.green : Colors.red);
+                    });
+            setState(() {
+              if (prefs.getString('token') != null) {
+                Navigator.pushReplacementNamed(context, Nav.routeName);
+              }
+              // check == true ? Navigator.pushReplacementNamed(context, Nav.routeName,) : {};
+            });
           },
           child: Text('LOGIN'),
         ),

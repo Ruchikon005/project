@@ -17,7 +17,7 @@ class _NavState extends State<Nav> {
   int _selectedIndex = 0;
   List<Widget> _widgetOption = <Widget>[
     Home(),
-    GoogleMapPage(),
+    CartScreen(),
     Account(),
   ];
 
@@ -41,8 +41,8 @@ class _NavState extends State<Nav> {
             label: 'Home',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.location_on_sharp),
-            label: 'location',
+            icon: Icon(Icons.shopping_cart_outlined),
+            label: 'Cart',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.perm_identity_sharp),

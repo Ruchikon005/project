@@ -9,7 +9,6 @@ import 'dart:convert' as convert;
 import 'package:http/http.dart' as http;
 
 class Product_to extends StatefulWidget {
-  
   const Product_to(bool Bool, {Key key}) : super(key: key);
   @override
   _Product_toState createState() => _Product_toState();
@@ -18,39 +17,44 @@ class Product_to extends StatefulWidget {
 class _Product_toState extends State<Product_to> {
   // bool check = Bool;
   static SharedPreferences prefs;
-  Map<String, dynamic> profile = User.profile;
+  Map<String, dynamic> profile = {
+    'user_id': '',
+    'username': '',
+    'email': '',
+    "role": ''
+  };
   int indexWidget = 0;
   List<FoodModel> foodModel = [];
 
   @override
   void initState() {
+    onGoBack();
     super.initState();
-    getProfile();
-    readApiProduct();
   }
 
-  // @override
-  // void setState(VoidCallback fn) {
-  //   // ignore: todo
-  //   // TODO: implement setState
-  //   super.setState(fn);
-  //   setState(() {});
-  // }
+  onGoBack() {
+    setState(() {
+      _getProfile();
+    });
+  }
 
-  void getProfile() async {
+  void _getProfile() async {
     prefs = await SharedPreferences.getInstance();
     var profileString = prefs.getString('profile');
+    print(profileString);
     if (profileString != null) {
       setState(() {
         profile = convert.jsonDecode(profileString);
-        print(profile['user_id']);
+        readApiProduct(profile);
       });
     }
   }
 
-  // ignore: missing_return
-  Future<Null> readApiProduct() async {
-    var url = Uri.parse('${ConfigIp.domain}/products/productlist_store/6');
+  Future<Null> readApiProduct(profile) async {
+    print('${profile['user_id']}++++++++++++');
+    // print('++++++++++');
+    var url = Uri.parse(
+        '${ConfigIp.domain}/products/productlist_store/${profile['user_id']}');
     final response = await http.get(url);
     print(response.body);
     var res = convert.jsonDecode(response.body);
@@ -61,12 +65,7 @@ class _Product_toState extends State<Product_to> {
         foodModel.add(food);
       });
     }
-
     // return compute(parseFood, response.body);
-  }
-
-  onGoBack(dynamic value) {
-    setState(() {});
   }
 
   Widget build(BuildContext context) {

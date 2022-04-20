@@ -1,5 +1,5 @@
 class ConfigIp {
-  static String domain = 'http://59bf-122-154-60-143.ngrok.io';
+  static String domain = 'https://bfac-27-55-82-203.ngrok.io';
   
   ConfigIp();
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:khnomapp/config_ip.dart';
 import 'package:khnomapp/model/openstore_model.dart';
 import 'package:khnomapp/screens/account_screen/personal_info_page.dart';
+import 'package:khnomapp/screens/account_screen/toship.dart';
 import 'package:khnomapp/screens/signin_screen/signin.dart';
 import 'package:khnomapp/screens/store_screen/create_store.dart';
 import 'package:khnomapp/screens/store_screen/store.dart';
@@ -96,29 +97,30 @@ class _MenuAccountState extends State<MenuAccount> {
           children: <Widget>[
            _manageStore(),
            ListTile(
-             title: Text('profile'),
+             title: Text('โปรไฟล์'),
              leading: Icon(Icons.list_alt_rounded),
              onTap: () => Navigator.pushNamed(context, PersonalInfo.routeName).then(onGoBack),
            ),
            ListTile(
-             title: Text('history'),
-             leading: Icon(Icons.list_alt_rounded),
+             title: Text('รายการนัดรับ'),
+             leading: Icon(Icons.shopify),
+             onTap: () => Navigator.pushNamed(context, Toship.routeName).then(onGoBack),
            ),
            ListTile(
-             title: Text('notification'),
+             title: Text('การแจ้งเดือน'),
              leading: Icon(Icons.notifications_rounded),
            ),
           
            ListTile(
-             title: Text('setting'),
+             title: Text('การตั้งค่า'),
              leading: Icon(Icons.settings),
            ),
            ListTile(
-             title: Text('Help'),
+             title: Text('ช่วยเหลือ'),
              leading: Icon(Icons.help_outline),
            ),
            ListTile(
-             title: Text('signout'),
+             title: Text('ออกจากระบบ'),
              leading: Icon(Icons.logout),
              onTap: () => _logout(),
            ),
@@ -133,43 +135,28 @@ class _MenuAccountState extends State<MenuAccount> {
     return FutureBuilder<String>(
       future: getStore(),
       builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
-        List<Widget> children;
-        if (snapshot.hasData) {
+        if (snapshot.hasData == null) {
           print(snapshot);
-          children = <Widget>[
-            ListTile(
-             title: Text('Store'),
-             tileColor: Colors.red[400],
-             leading: Icon(Icons.add_business_rounded),
-             onTap: () => {
-               print('gotostore${profile['user_id']}'),
-               Navigator.pushNamed(context, Store.routeName,arguments: OpenStore(1))},
-            //  Navigator.pushNamed(context, CreateStore.rountName),
-           ),
-          ];
-        } else {
-          // print('manage');
-          // print(snapshot);
-
-          children = <Widget>[
-            ListTile(
-             title: Text('Create Store'),
+          return ListTile(
+             title: Text('เริ่มการขาย'),
              tileColor: Colors.red[400],
              leading: Icon(Icons.add_business_rounded),
              onTap: () => {
                print('${profile['user_id']}'),
                normalDialog(context,'${profile['user_id']}')},
             //  Navigator.pushNamed(context, CreateStore.rountName),
-           ),
-          ];
+           );
+        } else {
+          return ListTile(
+             title: Text('ร้านค้าของฉัน'),
+             tileColor: Colors.red[400],
+             leading: Icon(Icons.add_business_rounded),
+             onTap: () => {
+               print('gotostore${profile['user_id']}'),
+               Navigator.pushNamed(context, Store.routeName,arguments: OpenStore(1))},
+            //  Navigator.pushNamed(context, CreateStore.rountName),
+           );
         }
-        return Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: children,
-          ),
-        );
       },
     );
   }

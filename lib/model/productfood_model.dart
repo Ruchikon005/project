@@ -8,6 +8,7 @@ class FoodModel {
   final int quantity;
   final String createdAt;
   final String updateAt;
+  final int stid;
 
   FoodModel({
     this.product_id,
@@ -19,6 +20,7 @@ class FoodModel {
     this.quantity,
     this.createdAt,
     this.updateAt,
+    this.stid,
   });
 
   factory FoodModel.fromJson(Map<String, dynamic> json) {
@@ -32,6 +34,7 @@ class FoodModel {
       quantity: json['quantity'] as int,
       createdAt: json['createdAt'] as String,
       updateAt: json['updateAt'] as String,
+      stid: json['stid'] as int,
     );
   }
 
@@ -46,6 +49,7 @@ class FoodModel {
     data['quantity'] = this.quantity;
     data['createdAt'] = this.createdAt;
     data['updateAt'] = this.updateAt;
+    data['stid'] = this.stid;
     return data;
   }
 }

@@ -1,4 +1,3 @@
-import 'dart:math';
 
 import 'package:flutter/material.dart';
 
@@ -155,21 +154,12 @@ class _AddlocationState extends State<AddLocation> {
                 SizedBox(
                   height: 10,
                 ),
-                Container(
-                  child: Column(
-                    children: [
-                      Text("เพิ่มสถานที่นัดรับ"),
-                      Row(
-                        children: [
-                          Text('1.'),
-                          TextFormField(
-                            decoration: InputDecoration(),
-                          )
-                        ],
-                      )
-                    ],
-                  ),
-                ),
+                
+                Row(
+                  children: [
+                    Text("เพิ่มสถานที่"),
+                  ],
+                )
               ],
             ),
           ),
