@@ -1,7 +1,13 @@
+import 'dart:async';
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:khnomapp/config_ip.dart';
 import 'package:khnomapp/model/invoice_model.dart';
 import 'package:khnomapp/model/productfood_model.dart';
+import 'package:khnomapp/screens/account_screen/page/map_toship.dart';
+import 'package:http/http.dart' as http;
+import 'package:khnomapp/screens/account_screen/toship.dart';
 
 class ToshipDetail extends StatefulWidget {
   static var routeName = '/toship_detail';
@@ -182,7 +188,12 @@ class _ToshipDetailState extends State<ToshipDetail> {
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: IconButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.of(context).pushNamed(
+                            maptoship.routeName,
+                            arguments: args.invoiceModel.name_location,
+                          );
+                        },
                         icon: Icon(
                           Icons.turn_right_rounded,
                           color: Colors.white,
@@ -244,8 +255,11 @@ class _ToshipDetailState extends State<ToshipDetail> {
           Container(
             height: 50,
             child: ElevatedButton(
-              onPressed: () {
+              onPressed: () async {
                 print('Click');
+                await updatereceiptStatus(
+                    args.invoiceModel.invoice_id, 'สำเร็จ');
+                showSuccess();
               },
               style: ButtonStyle(
                   backgroundColor: MaterialStateProperty.all(
@@ -259,6 +273,43 @@ class _ToshipDetailState extends State<ToshipDetail> {
         ],
       ),
     );
+  }
+
+  Future updatereceiptStatus(invoice_id, receiptstatus) async {
+    var url = '${ConfigIp.domain}/invoice/updatestatus/$invoice_id';
+
+    http.Response response = await http.put(Uri.parse(url), body: {
+      'receipt_status': receiptstatus,
+    });
+    var data = jsonDecode(response.body);
+    if (response.statusCode == 200) {
+      print(response.body);
+    } else {
+      print(response.reasonPhrase);
+    }
+  }
+
+  Future showSuccess() async {
+    showDialog(
+        context: context,
+        builder: (BuildContext builderContext) {
+          Timer(Duration(seconds: 2), () {
+            // Navigator.pushNamed(context, Nav.routeName);
+            Navigator.popUntil(
+                context, (route) => route.settings.name == Toship.routeName);
+          });
+          return AlertDialog(
+            backgroundColor: Colors.green,
+            title: Text(
+              'สำเร็จ',
+              style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold),
+              textAlign: TextAlign.center,
+            ),
+          );
+        });
   }
 }
 

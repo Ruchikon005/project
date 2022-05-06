@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:khnomapp/screens/account_screen/Account.dart';
 import 'package:khnomapp/screens/cart_screeen/cart.dart';
-import 'package:khnomapp/screens/googlemap_screen/googleMap.dart';
 import 'package:khnomapp/screens/home_screen/Home.dart';
 
 class Nav extends StatefulWidget {

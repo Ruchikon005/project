@@ -25,3 +25,5 @@ Future createlocation(Map loca, String _namelo,String _detaillo) async {
     print(response.reasonPhrase);
   }
 }
+
+

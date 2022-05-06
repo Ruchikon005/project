@@ -38,12 +38,11 @@ class _ToshipState extends State<Toship> {
     super.initState();
   }
 
-
   Future<bool> getInvoice() async {
+    invoiceModel = [];
     profile = await getProfile();
     var data = await getInvoiceBycustomer(profile.username);
     print(data);
-    print('Testtttttttttttttttttttttttttttttttttt');
     for (var item in data) {
       InvoiceModel invoice = InvoiceModel.fromJson(item);
       setState(() {
@@ -66,7 +65,10 @@ class _ToshipState extends State<Toship> {
       appBar: AppBar(
         title: const Text(
           'รายการนัดรับ',
-          style: TextStyle(color: Color.fromARGB(255, 61, 61, 61),fontSize: 20,fontWeight: FontWeight.bold),
+          style: TextStyle(
+              color: Color.fromARGB(255, 61, 61, 61),
+              fontSize: 20,
+              fontWeight: FontWeight.bold),
         ),
         leading: IconButton(
             icon: Icon(Icons.arrow_back_ios_new_rounded),
@@ -78,73 +80,107 @@ class _ToshipState extends State<Toship> {
         backgroundColor: Colors.white,
       ),
       body: SingleChildScrollView(
-        child: Container(
-          height: heightScreen - 80,
-          child: ListView.builder(
-              // shrinkWrap: true,
-              scrollDirection: Axis.vertical,
-              physics: const AlwaysScrollableScrollPhysics(),
-              itemCount: invoiceModel.length,
-              itemBuilder: (ctx, i) {
-                return Container(
-                  height: 100,
-                  child: InkWell(
-                    onTap: () {
-                      print('Click');
-                      Navigator.of(context).pushNamed(ToshipDetail.routeName,arguments: SetArgumentInvoice(invoiceModel[i],product),);
-                    },
-                    child: Card(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 8),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            getProduct(invoiceModel[i]),
-                            Spacer(),
-                            Container(
-                              alignment: Alignment.center,
-                              height: 80,
-                              width: 120,
-                              decoration: BoxDecoration(
-                                color: Color.fromARGB(255, 184, 130, 61),
-                                borderRadius: BorderRadius.circular(5),
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      invoiceModel[i].date,
-                                      style: TextStyle(
-                                          fontSize: 16,
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.bold),
+        child: RefreshIndicator(
+          onRefresh: getInvoice,
+          child: Container(
+            height: heightScreen - 80,
+            child: ListView.builder(
+                // shrinkWrap: true,
+                scrollDirection: Axis.vertical,
+                physics: const AlwaysScrollableScrollPhysics(),
+                itemCount: invoiceModel.length,
+                itemBuilder: (ctx, i) {
+                  return Container(
+                    height: 100,
+                    child: InkWell(
+                      onTap: () {
+                        if (invoiceModel[i].receipt_status == 'สำเร็จ') {
+                          print('Click off');
+                        } else {
+                          print('Click');
+                          Navigator.of(context).pushNamed(
+                            ToshipDetail.routeName,
+                            arguments:
+                                SetArgumentInvoice(invoiceModel[i], product),
+                          );
+                        }
+                      },
+                      child: Card(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 8),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              getProduct(invoiceModel[i]),
+                              Spacer(),
+                              invoiceModel[i].receipt_status == 'สำเร็จ'
+                                  ? Container(
+                                      alignment: Alignment.center,
+                                      height: 80,
+                                      width: 120,
+                                      decoration: BoxDecoration(
+                                        color:
+                                            Color.fromARGB(255, 201, 201, 201),
+                                        borderRadius: BorderRadius.circular(5),
+                                      ),
+                                      child: Text(
+                                        invoiceModel[i].receipt_status,
+                                        style: TextStyle(
+                                            fontSize: 16,
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold),
+                                      ))
+                                  : Container(
+                                      alignment: Alignment.center,
+                                      height: 80,
+                                      width: 120,
+                                      decoration: BoxDecoration(
+                                        color:
+                                            Color.fromARGB(255, 184, 130, 61),
+                                        borderRadius: BorderRadius.circular(5),
+                                      ),
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Text(
+                                              invoiceModel[i].date,
+                                              style: TextStyle(
+                                                  fontSize: 16,
+                                                  color: Colors.white,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                            SizedBox(height: 8),
+                                            Text(
+                                              '${invoiceModel[i].time} น.',
+                                              style: TextStyle(
+                                                  fontSize: 16,
+                                                  color: Colors.white,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
                                     ),
-                                    SizedBox(height: 8),
-                                    Text(
-                                      '${invoiceModel[i].time} น.',
-                                      style: TextStyle(
-                                          fontSize: 16,
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                );
-              }),
+                  );
+                }),
+          ),
         ),
       ),
     );
   }
+
+  // _onGoback() async{
+
+  // }
 
   Future<FoodModel> getImageProduct(int productid) async {
     var data = await getProductByid(productid);

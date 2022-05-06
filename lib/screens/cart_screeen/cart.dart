@@ -9,14 +9,10 @@ import 'package:intl/intl.dart';
 import 'package:khnomapp/action/get_mycart.dart';
 import 'package:khnomapp/action/get_profileprefs.dart';
 import 'package:khnomapp/config_ip.dart';
-import 'package:khnomapp/main.dart';
 import 'package:khnomapp/model/location_model.dart';
 import 'package:khnomapp/model/productfood_model.dart';
-import 'package:khnomapp/model/profile_model.dart';
 import 'package:khnomapp/screens/cart_screeen/widget_cart/botton_widget.dart';
-import 'package:khnomapp/screens/cart_screeen/widget_cart/dialog_alert_widget.dart';
 import 'package:khnomapp/screens/cart_screeen/widget_cart/showmap.dart';
-import 'package:khnomapp/screens/creditcard_screen/creditcard.dart';
 import 'package:khnomapp/screens/payment_screen/payment.dart';
 import 'package:khnomapp/utility/my_style.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -72,7 +68,7 @@ class _CartScreenState extends State<CartScreen> {
   DateTime date;
   String dateFormatted;
   String dateMatFinal;
-
+  bool isTrue;
 
   String getDate() {
     if (date == null) {
@@ -114,18 +110,29 @@ class _CartScreenState extends State<CartScreen> {
   }
 
   Future getMyCart() async {
+    isTrue = null;
+    foodModel = FoodModel();
+    locationModel = [];
     String uid = profile['user_id'].toString();
     print(uid);
     var url = Uri.parse('${ConfigIp.domain}/cart/mycart/$uid');
     final response = await http.get(url);
-    print(response.body);
-    var res = convert.jsonDecode(response.body);
-    foodModel = FoodModel.fromJson(res);
-    print(foodModel.product_id);
-    setState(() {
-      total = foodModel.price;
-    });
-    await getLcation();
+    print("???????????????????????????");
+    if (response.statusCode == 200) {
+      print(response.body);
+      var res = convert.jsonDecode(response.body);
+      foodModel = FoodModel.fromJson(res);
+      print(foodModel.product_id);
+      setState(() {
+        total = foodModel.price;
+        isTrue = true;
+      });
+      await getLcation();
+    } else {
+      setState(() {
+        isTrue = false;
+      });
+    }
   }
 
   Future getLcation() async {
@@ -156,396 +163,431 @@ class _CartScreenState extends State<CartScreen> {
       body: FutureBuilder(
           future: myfuture,
           builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              return Stack(
-                children: [
-                  SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(10.0),
-                          child: Container(
-                            height: 200,
-                            width: double.infinity,
-                            decoration: BoxDecoration(
-                              color: Colors.greenAccent,
-                              borderRadius: BorderRadius.circular(10),
-                              image: DecorationImage(
-                                image: NetworkImage(
-                                    '${ConfigIp.domain}/${foodModel.image_path}'),
-                                fit: BoxFit.cover,
+            if (isTrue == true) {
+              return RefreshIndicator(
+                  onRefresh: _getProfile,
+                  child: Stack(
+                    children: [
+                      SingleChildScrollView(
+                        child: Column(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.all(10.0),
+                              child: Container(
+                                height: 200,
+                                width: double.infinity,
+                                decoration: BoxDecoration(
+                                  color: Colors.greenAccent,
+                                  borderRadius: BorderRadius.circular(10),
+                                  image: DecorationImage(
+                                    image: NetworkImage(
+                                        '${ConfigIp.domain}/${foodModel.image_path}'),
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
                               ),
                             ),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(30.0),
-                          child: Column(
-                            children: [
-                              Container(
-                                alignment: Alignment.centerLeft,
-                                child: Text(
-                                  foodModel.product_name,
+                            Padding(
+                              padding: const EdgeInsets.all(30.0),
+                              child: Column(
+                                children: [
+                                  Container(
+                                    alignment: Alignment.centerLeft,
+                                    child: Text(
+                                      foodModel.product_name,
+                                      style: TextStyle(
+                                          fontSize: 30,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
+                                  SizedBox(height: 10),
+                                  Container(
+                                    alignment: Alignment.centerLeft,
+                                    child: Text(
+                                      foodModel.product_detail,
+                                      style: TextStyle(
+                                        fontSize: 20,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 30),
+                              child: Row(
+                                children: [
+                                  Text(
+                                    'เลือกสถานที่นัดรับ',
+                                    style: TextStyle(fontSize: 18),
+                                  ),
+                                  DropdownButton<LocationModel>(
+                                    value: dropdownValue.location_name != null
+                                        ? dropdownValue
+                                        : null,
+                                    underline: Container(),
+                                    hint: Container(
+                                        alignment: Alignment.centerRight,
+                                        width: 180,
+                                        child: Text("เลือก",
+                                            style: TextStyle(fontSize: 15),
+                                            textAlign: TextAlign.end)),
+                                    selectedItemBuilder:
+                                        (BuildContext context) {
+                                      return locationModel.map<Widget>(
+                                          (LocationModel locationModel) {
+                                        return Container(
+                                            alignment: Alignment.centerRight,
+                                            width: 180,
+                                            child: Text(
+                                                locationModel.location_name,
+                                                style:
+                                                    TextStyle(fontSize: 15)));
+                                      }).toList();
+                                    },
+                                    items: locationModel
+                                        .map<DropdownMenuItem<LocationModel>>(
+                                            (LocationModel locationModel) {
+                                      return DropdownMenuItem<LocationModel>(
+                                        value: locationModel,
+                                        child: Text(locationModel.location_name,
+                                            style: TextStyle(fontSize: 15)),
+                                      );
+                                    }).toList(),
+                                    onChanged: (newValue) {
+                                      setState(() {
+                                        dropdownValue = newValue;
+                                        namelocation =
+                                            dropdownValue.location_name;
+                                        checkMap = true;
+                                      });
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 30),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'รายละเอียดสถานที่',
+                                    style: TextStyle(fontSize: 18),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            SizedBox(height: 8),
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 40),
+                              child: Row(
+                                children: [
+                                  dropdownValue.location_detail != null
+                                      ? Text(
+                                          '-- ' + dropdownValue.location_detail,
+                                          style: TextStyle(fontSize: 18),
+                                        )
+                                      : Text(
+                                          '--',
+                                          style: TextStyle(fontSize: 18),
+                                        )
+                                ],
+                              ),
+                            ),
+                            SizedBox(height: 30),
+                            showmap(dropdownValue),
+                            SizedBox(height: 30),
+                            Container(
+                              padding: EdgeInsets.symmetric(horizontal: 30),
+                              child: Column(
+                                children: [
+                                  ButtonHeaderWidget(
+                                    title: 'วันที่',
+                                    text: getDate(),
+                                    onClicked: () => pickDate(context),
+                                  ),
+                                  ButtonHeaderWidget(
+                                    title: 'เวลา',
+                                    text:
+                                        timeClock.isEmpty || timeMinute.isEmpty
+                                            ? 'Select Time'
+                                            : '$timeClock : $timeMinute',
+                                    onClicked: () async {
+                                      await selectTime(context);
+                                      timeClock.isEmpty || timeMinute.isEmpty
+                                          ? checkTime = false
+                                          : checkTime = true;
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ),
+                            SizedBox(height: 30),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                ElevatedButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      quantity == 1
+                                          ? null
+                                          : quantity = quantity - 1;
+                                      total = foodModel.price * quantity;
+                                    });
+                                  },
+                                  child: Icon(
+                                    Icons.horizontal_rule,
+                                    size: 30,
+                                    color: Colors.black54,
+                                  ),
+                                  style: ElevatedButton.styleFrom(
+                                      shape: CircleBorder(),
+                                      padding: EdgeInsets.all(12),
+                                      primary: Colors.white,
+                                      side: BorderSide(
+                                          color: Colors.black54, width: 1.0)),
+                                ),
+                                SizedBox(width: 15),
+                                Text(
+                                  '${quantity}',
                                   style: TextStyle(
                                       fontSize: 30,
                                       fontWeight: FontWeight.bold),
                                 ),
-                              ),
-                              SizedBox(height: 10),
-                              Container(
-                                alignment: Alignment.centerLeft,
-                                child: Text(
-                                  foodModel.product_detail,
-                                  style: TextStyle(
-                                    fontSize: 20,
+                                SizedBox(width: 15),
+                                ElevatedButton(
+                                  onPressed: () {
+                                    print(foodModel.quantity);
+                                    setState(() {
+                                      quantity == foodModel.quantity
+                                          ? null
+                                          : quantity = quantity + 1;
+                                      total = foodModel.price * quantity;
+                                    });
+                                  },
+                                  child: Icon(
+                                    Icons.add,
+                                    size: 30,
+                                    color: Colors.black54,
                                   ),
+                                  style: ElevatedButton.styleFrom(
+                                      shape: CircleBorder(),
+                                      padding: EdgeInsets.all(12),
+                                      primary: Colors.white,
+                                      side: BorderSide(
+                                          color: Colors.black54, width: 1.0)),
                                 ),
+                              ],
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 60, vertical: 30),
+                              child: Column(
+                                children: [
+                                  Row(
+                                    children: [
+                                      Text(
+                                        'จำนวน',
+                                        style: TextStyle(fontSize: 20),
+                                      ),
+                                      Spacer(),
+                                      Text(
+                                        '${quantity}',
+                                        style: TextStyle(fontSize: 20),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(height: 10),
+                                  Row(
+                                    children: [
+                                      Text(
+                                        'ราคารวม',
+                                        style: TextStyle(
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                      Spacer(),
+                                      quantity == 1
+                                          ? Text(
+                                              '${foodModel.price}',
+                                              style: TextStyle(
+                                                  fontSize: 20,
+                                                  fontWeight: FontWeight.bold),
+                                            )
+                                          : Text(
+                                              '${total}',
+                                              style: TextStyle(
+                                                  fontSize: 20,
+                                                  fontWeight: FontWeight.bold),
+                                            )
+                                    ],
+                                  )
+                                ],
                               ),
-                            ],
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 30),
-                          child: Row(
-                            children: [
-                              Text(
-                                'เลือกสถานที่นัดรับ',
-                                style: TextStyle(fontSize: 18),
-                              ),
-                              DropdownButton<LocationModel>(
-                                value: dropdownValue.location_name != null
-                                    ? dropdownValue
-                                    : null,
-                                underline: Container(),
-                                hint: Container(
-                                    alignment: Alignment.centerRight,
-                                    width: 180,
-                                    child: Text("เลือก",
-                                        style: TextStyle(fontSize: 15),
-                                        textAlign: TextAlign.end)),
-                                selectedItemBuilder: (BuildContext context) {
-                                  return locationModel.map<Widget>(
-                                      (LocationModel locationModel) {
-                                    return Container(
+                            ),
+                            Container(
+                              height: 50,
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 30, vertical: 5),
+                              decoration: BoxDecoration(
+                                  border: Border(
+                                      top: BorderSide(color: Colors.black26),
+                                      bottom:
+                                          BorderSide(color: Colors.black26))),
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.monetization_on_outlined,
+                                    color: Colors.orangeAccent.shade700,
+                                  ),
+                                  SizedBox(width: 5),
+                                  Text(
+                                    'ตั้งค่าการขำระเงิน',
+                                    style: TextStyle(fontSize: 20),
+                                  ),
+                                  Spacer(),
+                                  DropdownButton<String>(
+                                    value: dropdownValuePay == ''
+                                        ? null
+                                        : dropdownValuePay,
+                                    onChanged: (String value) => setState(() {
+                                      print(value);
+                                      dropdownValuePay = value;
+                                      howPay = dropdownValuePay;
+                                    }),
+                                    underline: Container(),
+                                    hint: Container(
                                         alignment: Alignment.centerRight,
-                                        width: 180,
-                                        child: Text(locationModel.location_name,
-                                            style: TextStyle(fontSize: 15)));
-                                  }).toList();
-                                },
-                                items: locationModel
-                                    .map<DropdownMenuItem<LocationModel>>(
-                                        (LocationModel locationModel) {
-                                  return DropdownMenuItem<LocationModel>(
-                                    value: locationModel,
-                                    child: Text(locationModel.location_name,
-                                        style: TextStyle(fontSize: 15)),
-                                  );
-                                }).toList(),
-                                onChanged: (newValue) {
-                                  setState(() {
-                                    dropdownValue = newValue;
-                                    namelocation = dropdownValue.location_name;
-                                    checkMap = true;
-                                  });
-                                },
+                                        width: 60,
+                                        child: Text("เลือก",
+                                            style: TextStyle(fontSize: 15),
+                                            textAlign: TextAlign.end)),
+                                    selectedItemBuilder:
+                                        (BuildContext context) {
+                                      return payM.map<Widget>((String item) {
+                                        return Container(
+                                            alignment: Alignment.centerRight,
+                                            width: 90,
+                                            child: Text(item));
+                                      }).toList();
+                                    },
+                                    items: payM.map((String item) {
+                                      return DropdownMenuItem<String>(
+                                        value: item,
+                                        child: Text(item),
+                                      );
+                                    }).toList(),
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 30),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              Text(
-                                'รายละเอียดสถานที่',
-                                style: TextStyle(fontSize: 18),
-                              ),
-                            ],
-                          ),
-                        ),
-                        SizedBox(height: 8),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 40),
-                          child: Row(
-                            children: [
-                              dropdownValue.location_detail != null
-                                  ? Text(
-                                      '-- ' + dropdownValue.location_detail,
-                                      style: TextStyle(fontSize: 18),
-                                    )
-                                  : Text(
-                                      '--',
-                                      style: TextStyle(fontSize: 18),
-                                    )
-                            ],
-                          ),
-                        ),
-                        SizedBox(height: 30),
-                        showmap(dropdownValue),
-                        SizedBox(height: 30),
-                        Container(
-                          padding: EdgeInsets.symmetric(horizontal: 30),
-                          child: Column(
-                            children: [
-                              ButtonHeaderWidget(
-                                title: 'วันที่',
-                                text: getDate(),
-                                onClicked: () => pickDate(context),
-                              ),
-                              ButtonHeaderWidget(
-                                title: 'เวลา',
-                                text: timeClock.isEmpty || timeMinute.isEmpty
-                                    ? 'Select Time'
-                                    : '$timeClock : $timeMinute',
-                                onClicked: () async {
-                                  await selectTime(context);
-                                  timeClock.isEmpty || timeMinute.isEmpty
-                                      ? checkTime = false
-                                      : checkTime = true;
-                                },
-                              ),
-                            ],
-                          ),
-                        ),
-                        SizedBox(height: 30),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            ElevatedButton(
-                              onPressed: () {
-                                setState(() {
-                                  quantity == 1
-                                      ? null
-                                      : quantity = quantity - 1;
-                                  total = foodModel.price * quantity;
-                                });
-                              },
-                              child: Icon(
-                                Icons.horizontal_rule,
-                                size: 30,
-                                color: Colors.black54,
-                              ),
-                              style: ElevatedButton.styleFrom(
-                                  shape: CircleBorder(),
-                                  padding: EdgeInsets.all(12),
-                                  primary: Colors.white,
-                                  side: BorderSide(
-                                      color: Colors.black54, width: 1.0)),
                             ),
-                            SizedBox(width: 15),
-                            Text(
-                              '${quantity}',
-                              style: TextStyle(
-                                  fontSize: 30, fontWeight: FontWeight.bold),
-                            ),
-                            SizedBox(width: 15),
-                            ElevatedButton(
-                              onPressed: () {
-                                print(foodModel.quantity);
-                                setState(() {
-                                  quantity == foodModel.quantity
-                                      ? null
-                                      : quantity = quantity + 1;
-                                  total = foodModel.price * quantity;
-                                });
-                              },
-                              child: Icon(
-                                Icons.add,
-                                size: 30,
-                                color: Colors.black54,
-                              ),
-                              style: ElevatedButton.styleFrom(
-                                  shape: CircleBorder(),
-                                  padding: EdgeInsets.all(12),
-                                  primary: Colors.white,
-                                  side: BorderSide(
-                                      color: Colors.black54, width: 1.0)),
-                            ),
+                            Container(
+                              height: 100,
+                            )
                           ],
                         ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 60, vertical: 30),
-                          child: Column(
-                            children: [
-                              Row(
-                                children: [
-                                  Text(
-                                    'จำนวน',
-                                    style: TextStyle(fontSize: 20),
-                                  ),
-                                  Spacer(),
-                                  Text(
-                                    '${quantity}',
-                                    style: TextStyle(fontSize: 20),
-                                  ),
-                                ],
-                              ),
-                              SizedBox(height: 10),
-                              Row(
-                                children: [
-                                  Text(
-                                    'ราคารวม',
-                                    style: TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                  Spacer(),
-                                  quantity == 1
-                                      ? Text(
-                                          '${foodModel.price}',
-                                          style: TextStyle(
-                                              fontSize: 20,
-                                              fontWeight: FontWeight.bold),
-                                        )
-                                      : Text(
-                                          '${total}',
-                                          style: TextStyle(
-                                              fontSize: 20,
-                                              fontWeight: FontWeight.bold),
-                                        )
-                                ],
-                              )
-                            ],
-                          ),
-                        ),
-                        InkWell(
-                          onTap: () {
-                            Navigator.pushNamed(
-                                context, CreditCardScreen.routeName);
-                          },
-                          child: Container(
-                            height: 50,
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 30, vertical: 5),
-                            decoration: BoxDecoration(
-                                border: Border(
-                                    top: BorderSide(color: Colors.black26),
-                                    bottom: BorderSide(color: Colors.black26))),
-                            child: Row(
-                              children: [
-                                Icon(
-                                  Icons.monetization_on_outlined,
-                                  color: Colors.orangeAccent.shade700,
-                                ),
-                                SizedBox(width: 5),
-                                Text(
-                                  'ตั้งค่าการขำระเงิน',
-                                  style: TextStyle(fontSize: 20),
-                                ),
-                                Spacer(),
-                                DropdownButton<String>(
-                                  value: dropdownValuePay == ''
-                                      ? null
-                                      : dropdownValuePay,
-                                  onChanged: (String value) => setState(() {
-                                    print(value);
-                                    dropdownValuePay = value;
-                                    howPay = dropdownValuePay;
-                                  }),
-                                  underline: Container(),
-                                  hint: Container(
-                                      alignment: Alignment.centerRight,
-                                      width: 60,
-                                      child: Text("เลือก",
-                                          style: TextStyle(fontSize: 15),
-                                          textAlign: TextAlign.end)),
-                                  selectedItemBuilder: (BuildContext context) {
-                                    return payM.map<Widget>((String item) {
-                                      return Container(
-                                          alignment: Alignment.centerRight,
-                                          width: 90,
-                                          child: Text(item));
-                                    }).toList();
-                                  },
-                                  items: payM.map((String item) {
-                                    return DropdownMenuItem<String>(
-                                      value: item,
-                                      child: Text(item),
-                                    );
-                                  }).toList(),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        Container(
-                          height: 100,
-                        )
-                      ],
-                    ),
-                  ),
-                  Container(
-                    alignment: Alignment.bottomCenter,
-                    child: Container(
-                      padding: EdgeInsets.all(10),
-                      height: 80,
-                      color: Colors.white,
-                      child: InkWell(
-                          onTap: total == null
-                              ? total = foodModel.price
-                              : () {
-                                  print(total);
-                                  String amount;
-                                  setState(() {
-                                    amount = total.toString();
-                                  });
-                                  if (checkMap == true) {
-                                    if (dateFormatted == null) {
-                                      print('กรุณาเลือกวันที่นัดรับ');
-                                      _alertdialogisEmty(context);
-                                      print(checkTime);
-                                    } else {
-                                      if (checkTime == false) {
-                                        print('กรุณาเลือกเวลานัดรับ');
-                                        _alertdialogisEmty(context);
-                                      } else {
-                                        String timeFinal ='$timeClock:$timeMinute';
-                                        if (howPay == 'เงินสด') {
-                                          print(howPay);
-                                        } else if (howPay == 'credit card') {
-                                          print(howPay);
-                                          print(foodModel.stid);
-                                          Navigator.pushNamed(
-                                              context, PaymentScreen.routeName,
-                                              arguments: ScreenArguments(amount,quantity.toString(), foodModel.product_id,dateMatFinal, timeFinal, namelocation,foodModel.stid));
-                                        } else {
-                                          print('กรุณาเลือกวิธีชำระเงิน');
+                      ),
+                      Container(
+                        alignment: Alignment.bottomCenter,
+                        child: Container(
+                          padding: EdgeInsets.all(10),
+                          height: 80,
+                          color: Colors.white,
+                          child: InkWell(
+                              onTap: total == null
+                                  ? total = foodModel.price
+                                  : () {
+                                      print(total);
+                                      String amount;
+                                      setState(() {
+                                        amount = total.toString();
+                                      });
+                                      if (checkMap == true) {
+                                        if (dateFormatted == null) {
+                                          print('กรุณาเลือกวันที่นัดรับ');
                                           _alertdialogisEmty(context);
+                                          print(checkTime);
+                                        } else {
+                                          if (checkTime == false) {
+                                            print('กรุณาเลือกเวลานัดรับ');
+                                            _alertdialogisEmty(context);
+                                          } else {
+                                            String timeFinal =
+                                                '$timeClock:$timeMinute';
+                                            if (howPay == 'เงินสด') {
+                                              print(howPay);
+                                              Navigator.pushNamed(context,
+                                                  PaymentScreen.routeName,
+                                                  arguments: ScreenArguments(
+                                                      howPay,
+                                                      amount,
+                                                      quantity.toString(),
+                                                      foodModel.product_id,
+                                                      dateMatFinal,
+                                                      timeFinal,
+                                                      namelocation,
+                                                      foodModel.stid));
+                                            } else if (howPay ==
+                                                'credit card') {
+                                              print(howPay);
+                                              print(foodModel.stid);
+                                              Navigator.pushNamed(context,
+                                                  PaymentScreen.routeName,
+                                                  arguments: ScreenArguments(
+                                                      howPay,
+                                                      amount,
+                                                      quantity.toString(),
+                                                      foodModel.product_id,
+                                                      dateMatFinal,
+                                                      timeFinal,
+                                                      namelocation,
+                                                      foodModel.stid));
+                                            } else {
+                                              print('กรุณาเลือกวิธีชำระเงิน');
+                                              _alertdialogisEmty(context);
+                                            }
+                                          }
                                         }
+                                      } else {
+                                        print('กรุณาเลือกสถานที่');
+                                        _alertdialogisEmty(context);
                                       }
-                                    }
-                                  } else {
-                                    print('กรุณาเลือกสถานที่');
-                                    _alertdialogisEmty(context);
-                                  }
 
-                                  // showHowpay();
-                                },
-                          child: Container(
-                            decoration: BoxDecoration(
-                                color: MyStyle().colorCustom,
-                                borderRadius: BorderRadius.circular(5)),
-                            padding: EdgeInsets.symmetric(horizontal: 15),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  'ชำระเงิน',
-                                  style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 25,
-                                      fontWeight: FontWeight.bold),
+                                      // showHowpay();
+                                    },
+                              child: Container(
+                                decoration: BoxDecoration(
+                                    color: MyStyle().colorCustom,
+                                    borderRadius: BorderRadius.circular(5)),
+                                padding: EdgeInsets.symmetric(horizontal: 15),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      'ชำระเงิน',
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 25,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  ],
                                 ),
-                              ],
-                            ),
-                          )),
-                    ),
-                  ),
-                ],
+                              )),
+                        ),
+                      ),
+                    ],
+                  ));
+            } else if (isTrue == false) {
+              return Center(
+                child: Text(
+                  'ไม่มีสินค้าในตะกล้า',
+                  style: TextStyle(color: Colors.black45),
+                ),
               );
             } else {
               return Center(
@@ -742,7 +784,7 @@ class _CartScreenState extends State<CartScreen> {
       context: context,
       initialDate: date ?? initialDate,
       firstDate: now,
-      lastDate: DateTime(now.year - 2, lastday - 2, now.day + 2),
+      lastDate: DateTime(now.year - 2, lastday, now.day),
       // lastDate: DateTime(now.day),
     );
 
@@ -757,6 +799,7 @@ class _CartScreenState extends State<CartScreen> {
 }
 
 class ScreenArguments {
+  final String howpay;
   final String amount;
   final String qauntity;
   final int product_id;
@@ -765,6 +808,6 @@ class ScreenArguments {
   final String namelocation;
   final int stid;
 
-
-  ScreenArguments(this.amount, this.qauntity, this.product_id, this.dateMatFinal, this.timeFinal, this.namelocation, this.stid);
+  ScreenArguments(this.howpay, this.amount, this.qauntity, this.product_id,
+      this.dateMatFinal, this.timeFinal, this.namelocation, this.stid);
 }

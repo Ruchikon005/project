@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:khnomapp/config_ip.dart';
 import 'package:khnomapp/model/invoice_model.dart';
 import 'package:khnomapp/model/productfood_model.dart';
+import 'package:khnomapp/screens/store_screen/pages/map_order.dart';
 
 class OrderDetail extends StatefulWidget {
   static var routeName = '/order_detail';
@@ -218,7 +219,12 @@ class _OrderDetailState extends State<OrderDetail> {
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: IconButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.of(context).pushNamed(
+                            mapOrder.routeName,
+                            arguments: args.invoiceModel.name_location,
+                          );
+                        },
                         icon: Icon(
                           Icons.turn_right_rounded,
                           color: Colors.white,

@@ -57,6 +57,7 @@ class _OrderState extends State<Order> {
   }
 
   Future<bool> getInvoice() async {
+    invoiceModel = [];
     await getStoreDetail();
     var data = await getInvoiceBystid(stid);
     print(data);
@@ -80,52 +81,76 @@ class _OrderState extends State<Order> {
     var weightScreen = MediaQuery.of(context).size.width;
     var heightScreen = MediaQuery.of(context).size.height;
     return SingleChildScrollView(
-      child: Container(
-        height: heightScreen - 350,
-        child: ListView.builder(
-            // shrinkWrap: true,
-            scrollDirection: Axis.vertical,
-            physics: const AlwaysScrollableScrollPhysics(),
-            itemCount: invoiceModel.length,
-            itemBuilder: (ctx, i) {
-              return Container(
-                height: 100,
-                child: InkWell(
-                  onTap: () {
-                    print('Click');
-                    Navigator.of(context).pushNamed(OrderDetail.routeName,arguments: SetArgumentInvoice(invoiceModel[i],product),);
-                  },
-                  child: Card(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16,vertical: 8),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          getProduct(invoiceModel[i]),
-                          Spacer(),
-                          Container(
-                            alignment: Alignment.center,
-                            height: 40,
-                            width: 100,
-                            decoration: BoxDecoration(
-                              color: Colors.lightGreen,
-                              borderRadius: BorderRadius.circular(25),
-                            ),
-                            child: Text(
-                              invoiceModel[i].status_pay,
-                              style: TextStyle(
-                                  fontSize: 18,
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                        ],
+      child: RefreshIndicator(
+        onRefresh: getInvoice,
+        child: Container(
+          height: heightScreen - 350,
+          child: ListView.builder(
+              // shrinkWrap: true,
+              scrollDirection: Axis.vertical,
+              physics: const AlwaysScrollableScrollPhysics(),
+              itemCount: invoiceModel.length,
+              itemBuilder: (ctx, i) {
+                return Container(
+                  height: 100,
+                  child: InkWell(
+                    onTap: () {
+                      print('Click');
+                      Navigator.of(context).pushNamed(
+                        OrderDetail.routeName,
+                        arguments: SetArgumentInvoice(invoiceModel[i], product),
+                      );
+                    },
+                    child: Card(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 8),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            getProduct(invoiceModel[i]),
+                            Spacer(),
+                            invoiceModel[i].receipt_status == 'สำเร็จ'
+                                ? Container(
+                                    alignment: Alignment.center,
+                                    height: 40,
+                                    width: 100,
+                                    decoration: BoxDecoration(
+                                      color: Color.fromARGB(255, 201, 201, 201),
+                                      borderRadius: BorderRadius.circular(25),
+                                    ),
+                                    child: Text(
+                                      invoiceModel[i].receipt_status,
+                                      style: TextStyle(
+                                          fontSize: 18,
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  )
+                                : Container(
+                                    alignment: Alignment.center,
+                                    height: 40,
+                                    width: 100,
+                                    decoration: BoxDecoration(
+                                      color: Colors.lightGreen,
+                                      borderRadius: BorderRadius.circular(25),
+                                    ),
+                                    child: Text(
+                                      invoiceModel[i].status_pay,
+                                      style: TextStyle(
+                                          fontSize: 18,
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  )
+                          ],
+                        ),
                       ),
                     ),
                   ),
-                ),
-              );
-            }),
+                );
+              }),
+        ),
       ),
     );
   }
